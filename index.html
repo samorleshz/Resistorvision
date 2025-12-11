@@ -1,0 +1,2334 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ResistorVision 2.0 - Con Sistema de Aprendizaje</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Exo+2:wght@300;600;900&display=swap');
+        
+        :root {
+            --primary: #00ff88;
+            --secondary: #ff6b35;
+            --dark: #0a0e27;
+            --darker: #050714;
+            --light: #e8f4fd;
+            --circuit: #ffd700;
+            --error: #ff3366;
+            --success: #00ff88;
+            --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --circuit-gradient: linear-gradient(45deg, #00ff88, #00ccff);
+            --learning: #ff00ff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Exo 2', sans-serif;
+            background: var(--darker);
+            color: var(--light);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Fondo con patrón de circuito */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                repeating-linear-gradient(0deg, transparent, transparent 50px, rgba(0, 255, 136, 0.03) 50px, rgba(0, 255, 136, 0.03) 51px),
+                repeating-linear-gradient(90deg, transparent, transparent 50px, rgba(0, 204, 255, 0.03) 50px, rgba(0, 204, 255, 0.03) 51px);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        header {
+            text-align: center;
+            padding: 30px 0;
+            position: relative;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            font-weight: 900;
+            background: var(--circuit-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .version-badge {
+            display: inline-block;
+            background: var(--learning);
+            color: var(--dark);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 700;
+            margin-bottom: 10px;
+            animation: glow 2s ease-in-out infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(255, 0, 255, 0.5); }
+            50% { box-shadow: 0 0 30px rgba(255, 0, 255, 0.8); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        .subtitle {
+            color: var(--primary);
+            font-size: 1.1em;
+            font-weight: 300;
+            margin-bottom: 5px;
+        }
+
+        .credits {
+            font-size: 0.9em;
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 10px;
+            font-family: 'Space Mono', monospace;
+        }
+
+        .credits span {
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        /* Estadísticas de aprendizaje */
+        .learning-stats {
+            background: rgba(255, 0, 255, 0.1);
+            border: 1px solid var(--learning);
+            border-radius: 15px;
+            padding: 15px;
+            margin: 20px 0;
+            display: flex;
+            justify-content: space-around;
+            backdrop-filter: blur(10px);
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: var(--learning);
+            font-family: 'Space Mono', monospace;
+        }
+
+        .stat-label {
+            font-size: 0.8em;
+            color: rgba(255, 255, 255, 0.7);
+            text-transform: uppercase;
+        }
+
+        .mode-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 5px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            background: transparent;
+            color: var(--light);
+            font-size: 0.9em;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            font-family: 'Exo 2', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .mode-btn.active {
+            background: var(--circuit-gradient);
+            color: var(--dark);
+            box-shadow: 0 4px 20px rgba(0, 255, 136, 0.3);
+        }
+
+        /* Sección de Análisis con Foto */
+        .photo-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            margin-bottom: 20px;
+        }
+
+        #photoCanvas {
+            width: 100%;
+            max-width: 100%;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            cursor: crosshair;
+            display: none;
+            margin-bottom: 20px;
+            background: #000;
+        }
+
+        .photo-upload-area {
+            border: 3px dashed var(--primary);
+            border-radius: 15px;
+            padding: 40px 20px;
+            text-align: center;
+            background: rgba(0, 255, 136, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .photo-upload-area:hover {
+            background: rgba(0, 255, 136, 0.1);
+            transform: scale(1.02);
+        }
+
+        .photo-instructions {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .photo-instructions.active {
+            display: block;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+            opacity: 0.5;
+            transition: all 0.3s ease;
+        }
+
+        .step.active {
+            opacity: 1;
+            transform: translateX(10px);
+        }
+
+        .step.completed {
+            opacity: 1;
+            color: var(--success);
+        }
+
+        .step-number {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            margin-right: 10px;
+        }
+
+        .step.completed .step-number {
+            background: var(--success);
+        }
+
+        /* Marcadores de bandas */
+        .band-marker {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--primary);
+            border-radius: 50%;
+            background: rgba(0, 255, 136, 0.2);
+            transform: translate(-50%, -50%);
+            cursor: move;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: var(--dark);
+            font-size: 0.9em;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+            animation: markerPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes markerPulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.1); }
+        }
+
+        .band-marker.selected {
+            border-color: var(--learning);
+            background: rgba(255, 0, 255, 0.3);
+            box-shadow: 0 0 30px rgba(255, 0, 255, 0.8);
+        }
+
+        /* Sección de Entrenamiento */
+        .training-section {
+            background: rgba(255, 0, 255, 0.05);
+            border-radius: 20px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--learning);
+            display: none;
+        }
+
+        .training-controls {
+            display: grid;
+            gap: 15px;
+        }
+
+        .training-input {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .training-input label {
+            color: var(--learning);
+            font-weight: 600;
+        }
+
+        .training-input input {
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid var(--learning);
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--light);
+            font-family: 'Space Mono', monospace;
+        }
+
+        .color-sample {
+            width: 30px;
+            height: 30px;
+            border-radius: 10px;
+            display: inline-block;
+            margin-left: 10px;
+            vertical-align: middle;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        /* Base de datos de patrones */
+        .pattern-database {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+        }
+
+        .pattern-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            margin: 5px 0;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .pattern-item:hover {
+            transform: translateX(5px);
+            border-left: 3px solid var(--learning);
+        }
+
+        .pattern-colors {
+            display: flex;
+            gap: 5px;
+        }
+
+        .pattern-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 5px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        /* Sección Manual mejorada */
+        .manual-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            display: none;
+        }
+
+        .resistor-visual {
+            width: 100%;
+            max-width: 400px;
+            height: 100px;
+            margin: 20px auto;
+            position: relative;
+            background: linear-gradient(90deg, #d4a574 0%, #c19660 50%, #d4a574 100%);
+            border-radius: 20px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            padding: 0 30px;
+        }
+
+        .band {
+            width: 15px;
+            height: 80%;
+            border-radius: 3px;
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .band:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+
+        /* Botones principales */
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-family: 'Exo 2', sans-serif;
+            margin: 5px 0;
+        }
+
+        .btn-primary {
+            background: var(--circuit-gradient);
+            color: var(--dark);
+            box-shadow: 0 5px 20px rgba(0, 255, 136, 0.3);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 30px rgba(0, 255, 136, 0.5);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--light);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: rgba(0, 255, 136, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .btn-learning {
+            background: linear-gradient(45deg, var(--learning), #ff00ff88);
+            color: var(--light);
+            border: 2px solid var(--learning);
+        }
+
+        .btn-learning:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 30px rgba(255, 0, 255, 0.5);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Resultado mejorado */
+        .result {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 25px;
+            margin-top: 20px;
+            backdrop-filter: blur(10px);
+            border: 2px solid var(--primary);
+            box-shadow: 0 10px 40px rgba(0, 255, 136, 0.2);
+            animation: slideIn 0.5s ease;
+        }
+
+        .confidence-meter {
+            margin: 15px 0;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+
+        .confidence-bar {
+            height: 20px;
+            border-radius: 10px;
+            background: linear-gradient(90deg, 
+                var(--error) 0%, 
+                var(--secondary) 50%, 
+                var(--success) 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .confidence-indicator {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.3);
+            transition: width 0.5s ease;
+        }
+
+        .confidence-text {
+            text-align: center;
+            margin-top: 5px;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.9em;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-value {
+            font-size: 2.5em;
+            font-weight: 900;
+            color: var(--primary);
+            text-align: center;
+            margin-bottom: 15px;
+            font-family: 'Space Mono', monospace;
+            text-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+        }
+
+        /* Mensajes mejorados */
+        .message {
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+            text-align: center;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .message.error {
+            background: rgba(255, 51, 102, 0.1);
+            border: 1px solid var(--error);
+            color: var(--error);
+        }
+
+        .message.success {
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid var(--success);
+            color: var(--success);
+        }
+
+        .message.info {
+            background: rgba(0, 204, 255, 0.1);
+            border: 1px solid #00ccff;
+            color: #00ccff;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Historial mejorado */
+        .history-section {
+            margin-top: 30px;
+        }
+
+        .history-title {
+            font-size: 1.3em;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Info cards */
+        .info-card {
+            background: rgba(255, 107, 53, 0.1);
+            border: 1px solid var(--secondary);
+            border-radius: 15px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+
+        .info-card h3 {
+            color: var(--secondary);
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.8em;
+            }
+            
+            .mode-btn {
+                font-size: 0.8em;
+                padding: 10px 5px;
+            }
+            
+            .result-value {
+                font-size: 2em;
+            }
+        }
+
+        /* Loading spinner */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            margin: 0 auto;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            margin-top: 10px;
+            color: var(--primary);
+        }
+
+        /* Canvas overlay para selección */
+        #selectionCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+        }
+
+        /* Tooltip */
+        .tooltip {
+            position: absolute;
+            background: var(--dark);
+            color: var(--light);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.9em;
+            border: 1px solid var(--primary);
+            pointer-events: none;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .tooltip.active {
+            opacity: 1;
+        }
+
+        /* Tutorial overlay */
+        .tutorial-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .tutorial-content {
+            background: var(--dark);
+            border: 2px solid var(--primary);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .tutorial-title {
+            font-size: 1.5em;
+            color: var(--primary);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .tutorial-steps {
+            margin: 20px 0;
+        }
+
+        .tutorial-step {
+            margin: 15px 0;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            border-left: 3px solid var(--primary);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="version-badge">v2.0 Con IA que Aprende</div>
+            <h1>ResistorVision</h1>
+            <div class="subtitle">Sistema Inteligente de Detección con Aprendizaje</div>
+            <div class="credits">
+                Creado por <span>ClaudIA</span> y <span>Prof. Sergio</span>
+            </div>
+        </header>
+
+        <!-- Estadísticas de Aprendizaje -->
+        <div class="learning-stats" onclick="showDatabaseInfo({patterns: learningDatabase, exportDate: new Date().toISOString()})" style="cursor: pointer;">
+            <div class="stat-item">
+                <div class="stat-value" id="patternsCount">0</div>
+                <div class="stat-label">Patrones Aprendidos</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="accuracyRate">0%</div>
+                <div class="stat-label">Precisión</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="trainingSamples">0</div>
+                <div class="stat-label">Muestras</div>
+            </div>
+        </div>
+        <div style="text-align: center; font-size: 0.8em; opacity: 0.6; margin-top: -10px; margin-bottom: 20px;">
+            💡 Toca las estadísticas para ver detalles de la BD
+        </div>
+
+        <div class="mode-selector">
+            <button class="mode-btn active" onclick="switchMode('analyze')">
+                🔍 Analizar
+            </button>
+            <button class="mode-btn" onclick="switchMode('training')">
+                🧠 Entrenar
+            </button>
+            <button class="mode-btn" onclick="switchMode('manual')">
+                ✋ Manual
+            </button>
+        </div>
+
+        <!-- Sección de Análisis -->
+        <div id="analyzeSection" class="photo-section">
+            <div class="photo-upload-area" id="uploadArea">
+                <label for="photoInput" style="cursor: pointer;">
+                    <div style="font-size: 3em;">📷</div>
+                    <div style="margin: 10px 0; font-size: 1.2em; font-weight: 600;">
+                        Toca para tomar o seleccionar foto
+                    </div>
+                    <div style="font-size: 0.9em; opacity: 0.7;">
+                        La resistencia debe estar horizontal y con buena luz
+                    </div>
+                </label>
+                <input type="file" id="photoInput" accept="image/*" capture="environment" style="display: none;" onchange="loadPhoto(this)">
+            </div>
+
+            <canvas id="photoCanvas"></canvas>
+            <canvas id="selectionCanvas" style="display: none;"></canvas>
+
+            <div class="photo-instructions" id="instructions">
+                <div class="step" id="step1">
+                    <div class="step-number">1</div>
+                    <div>Foto cargada - Ahora toca el centro de cada banda de color</div>
+                </div>
+                <div class="step" id="step2">
+                    <div class="step-number">2</div>
+                    <div>Empieza por la banda izquierda (primera cifra)</div>
+                </div>
+                <div class="step" id="step3">
+                    <div class="step-number">3</div>
+                    <div>Marca todas las bandas en orden (3, 4 o 5 bandas)</div>
+                </div>
+                <div class="step" id="step4">
+                    <div class="step-number">4</div>
+                    <div>Presiona "Analizar" cuando hayas marcado todas</div>
+                </div>
+            </div>
+
+            <button class="btn btn-primary" id="analyzeBtn" onclick="analyzeMarkedBands()" disabled>
+                🎯 Analizar Bandas Marcadas
+            </button>
+            
+            <button class="btn btn-secondary" onclick="resetAnalysis()">
+                🔄 Nueva Foto
+            </button>
+
+            <button class="btn btn-learning" onclick="switchMode('training')">
+                🧠 Entrenar con esta Resistencia
+            </button>
+        </div>
+
+        <!-- Sección de Entrenamiento -->
+        <div id="trainingSection" class="training-section">
+            <h3 style="color: var(--learning); margin-bottom: 20px;">
+                🧠 Modo Entrenamiento - Enseña al Sistema
+            </h3>
+            
+            <div class="message info">
+                Usa este modo con resistencias que conozcas su valor exacto para mejorar la precisión del sistema
+            </div>
+
+            <div class="training-controls">
+                <div class="training-input">
+                    <label>Valor Real:</label>
+                    <input type="text" id="knownValue" placeholder="ej: 1000" style="width: 100%;">
+                </div>
+                
+                <div class="training-input">
+                    <label>Unidad:</label>
+                    <select id="knownUnit" style="width: 100%; padding: 10px; border-radius: 10px; background: rgba(255,255,255,0.05); color: white; border: 1px solid var(--learning);">
+                        <option value="1">Ω (Ohms)</option>
+                        <option value="1000">kΩ (Kilohms)</option>
+                        <option value="1000000">MΩ (Megaohms)</option>
+                    </select>
+                </div>
+
+                <div class="training-input">
+                    <label>Tolerancia:</label>
+                    <select id="knownTolerance" style="width: 100%; padding: 10px; border-radius: 10px; background: rgba(255,255,255,0.05); color: white; border: 1px solid var(--learning);">
+                        <option value="5">±5% (Dorado)</option>
+                        <option value="10">±10% (Plateado)</option>
+                        <option value="1">±1% (Marrón)</option>
+                        <option value="2">±2% (Rojo)</option>
+                    </select>
+                </div>
+
+                <button class="btn btn-learning" onclick="startTraining()">
+                    📸 Tomar Foto para Entrenar
+                </button>
+
+                <div id="trainingCanvas" style="display: none; margin-top: 20px;">
+                    <canvas id="trainingPhoto"></canvas>
+                    <div class="photo-instructions active" style="margin-top: 15px;">
+                        <div class="step active">
+                            <div class="step-number">!</div>
+                            <div>Marca cada banda en la foto para que el sistema aprenda los colores</div>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="saveTrainingData()" id="saveTrainingBtn" disabled>
+                        💾 Guardar Patrón de Entrenamiento
+                    </button>
+                </div>
+            </div>
+
+            <!-- Base de datos de patrones aprendidos -->
+            <div class="pattern-database">
+                <h4 style="color: var(--learning); margin-bottom: 10px;">📊 Patrones Aprendidos</h4>
+                <div id="patternList"></div>
+                
+                <!-- Controles de base de datos -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px;">
+                    <button class="btn btn-learning" onclick="exportDatabase()">
+                        📥 Exportar BD
+                    </button>
+                    <button class="btn btn-learning" onclick="document.getElementById('importFile').click()">
+                        📤 Importar BD
+                    </button>
+                    <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importDatabase(this)">
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
+                    <button class="btn btn-secondary" onclick="shareDatabase()">
+                        📱 Compartir BD
+                    </button>
+                    <button class="btn btn-secondary" onclick="clearPatterns()">
+                        🗑️ Limpiar BD
+                    </button>
+                </div>
+                
+                <!-- Información de la base de datos -->
+                <div id="databaseInfo" style="margin-top: 15px; padding: 10px; background: rgba(255, 0, 255, 0.1); border-radius: 10px; font-size: 0.9em; display: none;">
+                    <div style="color: var(--learning); font-weight: 600; margin-bottom: 5px;">
+                        📊 Información de la BD
+                    </div>
+                    <div id="dbInfoContent"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección Manual (mejorada de v1) -->
+        <div id="manualSection" class="manual-section">
+            <div class="resistor-visual" id="resistorVisual">
+                <div class="band" id="band1" onclick="selectBand(1)"></div>
+                <div class="band" id="band2" onclick="selectBand(2)"></div>
+                <div class="band" id="band3" onclick="selectBand(3)"></div>
+                <div class="band" id="band4" onclick="selectBand(4)"></div>
+                <div class="band" id="band5" onclick="selectBand(5)"></div>
+            </div>
+
+            <div class="band-selector" id="bandSelector">
+                <div class="band-title" style="color: var(--primary); font-weight: 600; margin-bottom: 10px;">
+                    Selecciona Banda 1 (Primera Cifra)
+                </div>
+                <div class="color-grid" id="colorGrid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;"></div>
+            </div>
+
+            <button class="btn btn-primary" onclick="calculateManual()">
+                ⚡ Calcular Valor
+            </button>
+        </div>
+
+        <!-- Resultado -->
+        <div id="resultSection" style="display: none;">
+            <div class="result">
+                <div class="result-value" id="resultValue">--</div>
+                
+                <!-- Medidor de confianza -->
+                <div class="confidence-meter">
+                    <div class="confidence-bar">
+                        <div class="confidence-indicator" id="confidenceBar"></div>
+                    </div>
+                    <div class="confidence-text" id="confidenceText">
+                        Confianza: --
+                    </div>
+                </div>
+
+                <div class="result-details" style="display: grid; gap: 10px; margin-top: 15px;">
+                    <div class="result-item" style="display: flex; justify-content: space-between; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 10px;">
+                        <span style="color: rgba(255,255,255,0.7);">Tolerancia:</span>
+                        <span id="toleranceValue" style="font-weight: 700;">--</span>
+                    </div>
+                    <div class="result-item" style="display: flex; justify-content: space-between; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 10px;">
+                        <span style="color: rgba(255,255,255,0.7);">Potencia estimada:</span>
+                        <span id="powerValue" style="font-weight: 700;">--</span>
+                    </div>
+                    <div class="result-item" style="display: flex; justify-content: space-between; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 10px;">
+                        <span style="color: rgba(255,255,255,0.7);">Colores detectados:</span>
+                        <span id="colorsDetected" style="font-weight: 700;">--</span>
+                    </div>
+                    <div class="result-item" style="display: flex; justify-content: space-between; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 10px;">
+                        <span style="color: rgba(255,255,255,0.7);">Método usado:</span>
+                        <span id="methodUsed" style="font-weight: 700;">--</span>
+                    </div>
+                </div>
+
+                <button class="btn btn-learning" onclick="correctResult()" style="margin-top: 15px;">
+                    🔧 Corregir y Entrenar
+                </button>
+            </div>
+        </div>
+
+        <!-- Tutorial inicial -->
+        <div class="tutorial-overlay" id="tutorialOverlay">
+            <div class="tutorial-content">
+                <h2 class="tutorial-title">🚀 Bienvenido a ResistorVision 2.0</h2>
+                <div class="tutorial-steps">
+                    <div class="tutorial-step">
+                        <strong>🔍 Modo Analizar:</strong><br>
+                        Toma una foto y marca manualmente cada banda de color. El sistema usará los patrones aprendidos para mayor precisión.
+                    </div>
+                    <div class="tutorial-step">
+                        <strong>🧠 Modo Entrenar:</strong><br>
+                        Enseña al sistema con resistencias conocidas. Cada vez que entrenas, mejora la precisión.
+                    </div>
+                    <div class="tutorial-step">
+                        <strong>✋ Modo Manual:</strong><br>
+                        Selecciona los colores manualmente como en la versión 1.0
+                    </div>
+                    <div class="tutorial-step" style="background: rgba(255, 0, 255, 0.1); border-left-color: var(--learning);">
+                        <strong>📱 NUEVO - Compartir BD:</strong><br>
+                        • <strong>Exportar:</strong> Descarga tu base de datos como archivo JSON<br>
+                        • <strong>Importar:</strong> Carga bases de datos de compañeros o del profesor<br>
+                        • <strong>Compartir:</strong> Copia la BD para enviar por WhatsApp/Email<br>
+                        • Las BD se fusionan inteligentemente sin duplicar patrones
+                    </div>
+                    <div class="tutorial-step">
+                        <strong>💡 Tip:</strong><br>
+                        Empieza entrenando con 3-5 resistencias conocidas o importa una BD pre-entrenada para mejores resultados inmediatos.
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="closeTutorial()">
+                    ¡Entendido, Empezar!
+                </button>
+            </div>
+        </div>
+
+        <!-- Información adicional -->
+        <div class="info-card">
+            <h3>💡 Consejo del Modo Actual</h3>
+            <p id="tipText">En el modo Análisis, marca el centro de cada banda de color tocando la imagen.</p>
+        </div>
+
+        <!-- Historial -->
+        <div class="history-section">
+            <div class="history-title">📊 Historial de Mediciones</div>
+            <div id="historyList"></div>
+            <button class="btn btn-secondary" onclick="clearHistory()" style="margin-top: 10px;">
+                🗑️ Limpiar Historial
+            </button>
+        </div>
+    </div>
+
+    <!-- Tooltip flotante -->
+    <div class="tooltip" id="tooltip"></div>
+
+    <script>
+        // ============================================
+        // SISTEMA DE APRENDIZAJE Y DETECCIÓN v2.0
+        // ============================================
+        
+        // Tablas de colores base
+        const colorCodes = {
+            'Negro': { value: 0, multiplier: 1, tolerance: null, hex: '#000000', rgb: [0, 0, 0] },
+            'Marrón': { value: 1, multiplier: 10, tolerance: 1, hex: '#8B4513', rgb: [139, 69, 19] },
+            'Rojo': { value: 2, multiplier: 100, tolerance: 2, hex: '#FF0000', rgb: [255, 0, 0] },
+            'Naranja': { value: 3, multiplier: 1000, tolerance: null, hex: '#FFA500', rgb: [255, 165, 0] },
+            'Amarillo': { value: 4, multiplier: 10000, tolerance: 5, hex: '#FFFF00', rgb: [255, 255, 0] },
+            'Verde': { value: 5, multiplier: 100000, tolerance: 0.5, hex: '#008000', rgb: [0, 128, 0] },
+            'Azul': { value: 6, multiplier: 1000000, tolerance: 0.25, hex: '#0000FF', rgb: [0, 0, 255] },
+            'Violeta': { value: 7, multiplier: 10000000, tolerance: 0.1, hex: '#8B008B', rgb: [139, 0, 139] },
+            'Gris': { value: 8, multiplier: 100000000, tolerance: 0.05, hex: '#808080', rgb: [128, 128, 128] },
+            'Blanco': { value: 9, multiplier: 1000000000, tolerance: null, hex: '#FFFFFF', rgb: [255, 255, 255] },
+            'Dorado': { value: null, multiplier: 0.1, tolerance: 5, hex: '#FFD700', rgb: [255, 215, 0] },
+            'Plateado': { value: null, multiplier: 0.01, tolerance: 10, hex: '#C0C0C0', rgb: [192, 192, 192] }
+        };
+
+        // Variables globales
+        let currentMode = 'analyze';
+        let currentImage = null;
+        let bandMarkers = [];
+        let trainingMode = false;
+        let learningDatabase = [];
+        let history = [];
+        let selectedBand = 1;
+        let bandColors = {1: null, 2: null, 3: null, 4: null, 5: null};
+
+        // ============================================
+        // INICIALIZACIÓN
+        // ============================================
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadLearningDatabase();
+            loadHistory();
+            updateStats();
+            
+            // Mostrar tutorial si es primera vez
+            if (!localStorage.getItem('tutorialShown')) {
+                document.getElementById('tutorialOverlay').style.display = 'flex';
+            }
+            
+            // Configurar canvas para marcadores
+            setupCanvasEvents();
+        });
+
+        // ============================================
+        // SISTEMA DE APRENDIZAJE
+        // ============================================
+
+        function loadLearningDatabase() {
+            const saved = localStorage.getItem('resistorLearningDB');
+            if (saved) {
+                learningDatabase = JSON.parse(saved);
+            }
+            updatePatternDisplay();
+        }
+
+        function saveLearningDatabase() {
+            localStorage.setItem('resistorLearningDB', JSON.stringify(learningDatabase));
+            updateStats();
+            updatePatternDisplay();
+        }
+
+        function addLearningPattern(colors, actualValue, confidence = 1) {
+            const pattern = {
+                id: Date.now(),
+                colors: colors, // Array de RGB values para cada banda
+                actualValue: actualValue,
+                confidence: confidence,
+                timestamp: new Date().toISOString(),
+                usageCount: 0
+            };
+            
+            learningDatabase.push(pattern);
+            saveLearningDatabase();
+            showMessage('✅ Patrón aprendido exitosamente', 'success');
+        }
+
+        function findBestMatch(detectedColors) {
+            if (learningDatabase.length === 0) {
+                return null;
+            }
+            
+            let bestMatch = null;
+            let bestScore = Infinity;
+            
+            learningDatabase.forEach(pattern => {
+                let score = 0;
+                
+                // Comparar cada banda
+                for (let i = 0; i < Math.min(detectedColors.length, pattern.colors.length); i++) {
+                    const detected = detectedColors[i];
+                    const learned = pattern.colors[i];
+                    
+                    // Distancia euclidiana en espacio RGB
+                    const distance = Math.sqrt(
+                        Math.pow(detected.r - learned.r, 2) +
+                        Math.pow(detected.g - learned.g, 2) +
+                        Math.pow(detected.b - learned.b, 2)
+                    );
+                    
+                    score += distance;
+                }
+                
+                // Penalizar si el número de bandas no coincide
+                if (detectedColors.length !== pattern.colors.length) {
+                    score += 100;
+                }
+                
+                // Bonus por uso frecuente y confianza
+                score = score / (pattern.confidence * (1 + pattern.usageCount * 0.1));
+                
+                if (score < bestScore) {
+                    bestScore = score;
+                    bestMatch = { pattern: pattern, score: score };
+                }
+            });
+            
+            // Calcular confianza (0-100%)
+            const maxDistance = 255 * Math.sqrt(3) * 5; // Máxima distancia posible
+            const confidence = Math.max(0, Math.min(100, 100 - (bestScore / maxDistance * 100)));
+            
+            if (bestMatch && confidence > 30) { // Umbral mínimo de confianza
+                bestMatch.confidence = confidence;
+                bestMatch.pattern.usageCount++;
+                saveLearningDatabase();
+                return bestMatch;
+            }
+            
+            return null;
+        }
+
+        // ============================================
+        // MODO ANÁLISIS - Selección Manual de Bandas
+        // ============================================
+
+        function loadPhoto(input) {
+            const file = input.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    currentImage = img;
+                    displayImageForAnalysis(img);
+                    
+                    // Reset marcadores
+                    bandMarkers = [];
+                    updateAnalysisUI();
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function displayImageForAnalysis(img) {
+            const canvas = document.getElementById('photoCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Ajustar tamaño del canvas
+            const maxWidth = document.querySelector('.photo-section').clientWidth - 40;
+            const scale = Math.min(1, maxWidth / img.width);
+            
+            canvas.width = img.width * scale;
+            canvas.height = img.height * scale;
+            canvas.style.display = 'block';
+            
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            
+            // Ocultar área de upload y mostrar instrucciones
+            document.getElementById('uploadArea').style.display = 'none';
+            document.getElementById('instructions').classList.add('active');
+            
+            // Activar pasos
+            document.getElementById('step1').classList.add('completed');
+            document.getElementById('step2').classList.add('active');
+        }
+
+        function setupCanvasEvents() {
+            const canvas = document.getElementById('photoCanvas');
+            
+            canvas.addEventListener('click', function(e) {
+                if (!currentImage || bandMarkers.length >= 5) return;
+                
+                const rect = canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                // Agregar marcador
+                addBandMarker(x, y);
+            });
+            
+            // Mostrar tooltip al mover el mouse
+            canvas.addEventListener('mousemove', function(e) {
+                if (!currentImage) return;
+                
+                const rect = canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                // Obtener color en esa posición
+                const ctx = canvas.getContext('2d');
+                const pixel = ctx.getImageData(x, y, 1, 1).data;
+                
+                const tooltip = document.getElementById('tooltip');
+                tooltip.textContent = `RGB(${pixel[0]}, ${pixel[1]}, ${pixel[2]})`;
+                tooltip.style.left = e.clientX + 10 + 'px';
+                tooltip.style.top = e.clientY - 30 + 'px';
+                tooltip.classList.add('active');
+            });
+            
+            canvas.addEventListener('mouseleave', function() {
+                document.getElementById('tooltip').classList.remove('active');
+            });
+        }
+
+        function addBandMarker(x, y) {
+            const canvas = document.getElementById('photoCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Obtener color en ese punto (promedio de área 10x10)
+            const imageData = ctx.getImageData(Math.max(0, x - 5), Math.max(0, y - 5), 10, 10);
+            const pixels = imageData.data;
+            
+            let r = 0, g = 0, b = 0, count = 0;
+            for (let i = 0; i < pixels.length; i += 4) {
+                r += pixels[i];
+                g += pixels[i + 1];
+                b += pixels[i + 2];
+                count++;
+            }
+            
+            const avgColor = {
+                r: Math.round(r / count),
+                g: Math.round(g / count),
+                b: Math.round(b / count)
+            };
+            
+            // Agregar marcador
+            bandMarkers.push({
+                x: x,
+                y: y,
+                color: avgColor,
+                bandNumber: bandMarkers.length + 1
+            });
+            
+            // Dibujar marcador
+            drawMarkers();
+            updateAnalysisUI();
+            
+            // Vibración táctil si está disponible
+            if (navigator.vibrate) {
+                navigator.vibrate(50);
+            }
+            
+            showMessage(`Banda ${bandMarkers.length} marcada`, 'info');
+        }
+
+        function drawMarkers() {
+            const canvas = document.getElementById('photoCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Redibujar imagen
+            if (currentImage) {
+                const scale = canvas.width / currentImage.width;
+                ctx.drawImage(currentImage, 0, 0, canvas.width, canvas.height);
+            }
+            
+            // Dibujar marcadores
+            bandMarkers.forEach((marker, index) => {
+                // Círculo exterior
+                ctx.strokeStyle = '#00ff88';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.arc(marker.x, marker.y, 20, 0, 2 * Math.PI);
+                ctx.stroke();
+                
+                // Círculo interior con color detectado
+                ctx.fillStyle = `rgb(${marker.color.r}, ${marker.color.g}, ${marker.color.b})`;
+                ctx.beginPath();
+                ctx.arc(marker.x, marker.y, 15, 0, 2 * Math.PI);
+                ctx.fill();
+                
+                // Número de banda
+                ctx.fillStyle = '#000';
+                ctx.font = 'bold 14px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(index + 1, marker.x, marker.y);
+            });
+            
+            // Línea conectando marcadores
+            if (bandMarkers.length > 1) {
+                ctx.strokeStyle = 'rgba(0, 255, 136, 0.5)';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([5, 5]);
+                ctx.beginPath();
+                ctx.moveTo(bandMarkers[0].x, bandMarkers[0].y);
+                for (let i = 1; i < bandMarkers.length; i++) {
+                    ctx.lineTo(bandMarkers[i].x, bandMarkers[i].y);
+                }
+                ctx.stroke();
+                ctx.setLineDash([]);
+            }
+        }
+
+        function updateAnalysisUI() {
+            const analyzeBtn = document.getElementById('analyzeBtn');
+            
+            if (bandMarkers.length >= 3) {
+                analyzeBtn.disabled = false;
+                document.getElementById('step3').classList.add('completed');
+                document.getElementById('step4').classList.add('active');
+            } else {
+                analyzeBtn.disabled = true;
+            }
+            
+            if (bandMarkers.length > 0) {
+                document.getElementById('step2').classList.add('completed');
+                document.getElementById('step3').classList.add('active');
+            }
+        }
+
+        function analyzeMarkedBands() {
+            if (bandMarkers.length < 3) {
+                showMessage('Marca al menos 3 bandas para analizar', 'error');
+                return;
+            }
+            
+            // Mostrar loading
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'loading active';
+            loadingDiv.innerHTML = `
+                <div class="loading-spinner"></div>
+                <div class="loading-text">Analizando con IA...</div>
+            `;
+            document.getElementById('analyzeSection').appendChild(loadingDiv);
+            
+            setTimeout(() => {
+                // Extraer colores de las bandas marcadas
+                const detectedColors = bandMarkers.map(marker => marker.color);
+                
+                // Buscar coincidencia en base de datos de aprendizaje
+                const match = findBestMatch(detectedColors);
+                
+                let result;
+                let method;
+                let confidence;
+                
+                if (match && match.confidence > 50) {
+                    // Usar valor aprendido
+                    result = match.pattern.actualValue;
+                    method = 'IA Entrenada';
+                    confidence = match.confidence;
+                    showMessage(`Patrón reconocido con ${confidence.toFixed(0)}% de confianza`, 'success');
+                } else {
+                    // Fallback a detección tradicional
+                    const colorNames = detectedColors.map((color, index) => {
+                        if (index < 2 || (bandMarkers.length === 5 && index < 3)) {
+                            // Bandas de valor
+                            return findClosestColorName(color, true);
+                        } else if (index === bandMarkers.length - 1) {
+                            // Última banda: tolerancia
+                            return findClosestColorName(color, false, true);
+                        } else {
+                            // Multiplicador
+                            return findClosestColorName(color, false);
+                        }
+                    });
+                    
+                    result = calculateFromColors(colorNames);
+                    method = 'Análisis de Color';
+                    confidence = 40; // Confianza base para método tradicional
+                    
+                    if (match) {
+                        showMessage(`Confianza baja (${match.confidence.toFixed(0)}%), usando análisis tradicional`, 'info');
+                    }
+                }
+                
+                // Mostrar resultado
+                displayResult(result, detectedColors, method, confidence);
+                
+                // Remover loading
+                loadingDiv.remove();
+                
+                // Actualizar pasos
+                document.getElementById('step4').classList.add('completed');
+            }, 1500);
+        }
+
+        function findClosestColorName(rgb, isValueBand = false, isToleranceBand = false) {
+            let minDistance = Infinity;
+            let closestColor = 'Negro';
+            
+            for (const [colorName, colorData] of Object.entries(colorCodes)) {
+                // Saltar colores no válidos para ciertas bandas
+                if (isValueBand && colorData.value === null) continue;
+                if (isToleranceBand && colorData.tolerance === null) continue;
+                
+                const distance = Math.sqrt(
+                    Math.pow(rgb.r - colorData.rgb[0], 2) +
+                    Math.pow(rgb.g - colorData.rgb[1], 2) +
+                    Math.pow(rgb.b - colorData.rgb[2], 2)
+                );
+                
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    closestColor = colorName;
+                }
+            }
+            
+            return closestColor;
+        }
+
+        function calculateFromColors(colorNames) {
+            let value = 0;
+            let multiplierIndex;
+            let toleranceIndex;
+            
+            if (colorNames.length === 5) {
+                // 5 bandas
+                value = colorCodes[colorNames[0]].value * 100 +
+                        colorCodes[colorNames[1]].value * 10 +
+                        colorCodes[colorNames[2]].value;
+                multiplierIndex = 3;
+                toleranceIndex = 4;
+            } else if (colorNames.length === 4) {
+                // 4 bandas
+                value = colorCodes[colorNames[0]].value * 10 +
+                        colorCodes[colorNames[1]].value;
+                multiplierIndex = 2;
+                toleranceIndex = 3;
+            } else {
+                // 3 bandas
+                value = colorCodes[colorNames[0]].value * 10 +
+                        colorCodes[colorNames[1]].value;
+                multiplierIndex = 2;
+                toleranceIndex = -1; // Sin tolerancia
+            }
+            
+            const multiplier = colorCodes[colorNames[multiplierIndex]].multiplier;
+            const resistance = value * multiplier;
+            const tolerance = toleranceIndex >= 0 ? 
+                             colorCodes[colorNames[toleranceIndex]].tolerance : 20;
+            
+            return {
+                value: resistance,
+                tolerance: tolerance,
+                colors: colorNames
+            };
+        }
+
+        // ============================================
+        // MODO ENTRENAMIENTO
+        // ============================================
+
+        function startTraining() {
+            const value = document.getElementById('knownValue').value;
+            const unit = document.getElementById('knownUnit').value;
+            
+            if (!value) {
+                showMessage('Ingresa el valor conocido de la resistencia', 'error');
+                return;
+            }
+            
+            // Abrir selector de foto
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.capture = 'environment';
+            
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    const img = new Image();
+                    img.onload = function() {
+                        displayTrainingImage(img);
+                    };
+                    img.src = evt.target.result;
+                };
+                reader.readAsDataURL(file);
+            };
+            
+            input.click();
+        }
+
+        function displayTrainingImage(img) {
+            const canvas = document.getElementById('trainingPhoto');
+            const ctx = canvas.getContext('2d');
+            
+            // Ajustar tamaño
+            const maxWidth = document.querySelector('.training-section').clientWidth - 40;
+            const scale = Math.min(1, maxWidth / img.width);
+            
+            canvas.width = img.width * scale;
+            canvas.height = img.height * scale;
+            canvas.style.display = 'block';
+            
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            
+            // Mostrar canvas de entrenamiento
+            document.getElementById('trainingCanvas').style.display = 'block';
+            
+            // Reset marcadores para entrenamiento
+            currentImage = img;
+            bandMarkers = [];
+            trainingMode = true;
+            
+            // Configurar eventos para marcar bandas
+            canvas.onclick = function(e) {
+                const rect = canvas.getBoundingClientRect();
+                const x = (e.clientX - rect.left) * (img.width / canvas.width);
+                const y = (e.clientY - rect.top) * (img.height / canvas.height);
+                
+                addTrainingMarker(x, y, canvas, ctx);
+            };
+        }
+
+        function addTrainingMarker(x, y, canvas, ctx) {
+            if (bandMarkers.length >= 5) return;
+            
+            // Obtener color
+            const imageData = ctx.getImageData(
+                x * (canvas.width / currentImage.width) - 5,
+                y * (canvas.height / currentImage.height) - 5,
+                10, 10
+            );
+            const pixels = imageData.data;
+            
+            let r = 0, g = 0, b = 0, count = 0;
+            for (let i = 0; i < pixels.length; i += 4) {
+                r += pixels[i];
+                g += pixels[i + 1];
+                b += pixels[i + 2];
+                count++;
+            }
+            
+            const avgColor = {
+                r: Math.round(r / count),
+                g: Math.round(g / count),
+                b: Math.round(b / count)
+            };
+            
+            bandMarkers.push({
+                x: x * (canvas.width / currentImage.width),
+                y: y * (canvas.height / currentImage.height),
+                color: avgColor,
+                bandNumber: bandMarkers.length + 1
+            });
+            
+            // Redibujar con marcadores
+            ctx.drawImage(currentImage, 0, 0, canvas.width, canvas.height);
+            
+            bandMarkers.forEach((marker, index) => {
+                ctx.strokeStyle = '#ff00ff';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.arc(marker.x, marker.y, 20, 0, 2 * Math.PI);
+                ctx.stroke();
+                
+                ctx.fillStyle = `rgb(${marker.color.r}, ${marker.color.g}, ${marker.color.b})`;
+                ctx.beginPath();
+                ctx.arc(marker.x, marker.y, 15, 0, 2 * Math.PI);
+                ctx.fill();
+                
+                ctx.fillStyle = '#fff';
+                ctx.font = 'bold 14px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(index + 1, marker.x, marker.y);
+            });
+            
+            // Habilitar botón de guardar si hay suficientes marcadores
+            if (bandMarkers.length >= 3) {
+                document.getElementById('saveTrainingBtn').disabled = false;
+            }
+        }
+
+        function saveTrainingData() {
+            const value = parseFloat(document.getElementById('knownValue').value);
+            const unit = parseFloat(document.getElementById('knownUnit').value);
+            const actualValue = value * unit;
+            
+            if (bandMarkers.length < 3) {
+                showMessage('Marca al menos 3 bandas', 'error');
+                return;
+            }
+            
+            // Guardar patrón de colores
+            const colors = bandMarkers.map(marker => marker.color);
+            addLearningPattern(colors, actualValue, 1);
+            
+            // Reset
+            trainingMode = false;
+            document.getElementById('trainingCanvas').style.display = 'none';
+            document.getElementById('knownValue').value = '';
+            bandMarkers = [];
+            
+            showMessage('✅ Resistencia aprendida correctamente', 'success');
+            updateStats();
+        }
+
+        // ============================================
+        // MODO MANUAL
+        // ============================================
+
+        function initManualMode() {
+            const colorGrid = document.getElementById('colorGrid');
+            colorGrid.innerHTML = '';
+            
+            Object.entries(colorCodes).forEach(([colorName, colorData]) => {
+                if (colorData.value !== null) {
+                    const btn = document.createElement('div');
+                    btn.style.padding = '10px';
+                    btn.style.backgroundColor = colorData.hex;
+                    btn.style.color = colorData.hex === '#FFFF00' || colorData.hex === '#FFFFFF' ? '#000' : '#fff';
+                    btn.style.borderRadius = '10px';
+                    btn.style.cursor = 'pointer';
+                    btn.style.textAlign = 'center';
+                    btn.style.fontWeight = '600';
+                    btn.style.fontSize = '0.9em';
+                    btn.textContent = colorName;
+                    btn.onclick = () => selectColor(colorName);
+                    colorGrid.appendChild(btn);
+                }
+            });
+            
+            bandColors = {1: null, 2: null, 3: null, 4: null, 5: null};
+            updateResistorVisual();
+            selectBand(1);
+        }
+
+        function selectBand(band) {
+            selectedBand = band;
+            const titles = [
+                'Selecciona Banda 1 (Primera Cifra)',
+                'Selecciona Banda 2 (Segunda Cifra)',
+                'Selecciona Banda 3 (Tercera Cifra o Multiplicador)',
+                'Selecciona Banda 4 (Multiplicador)',
+                'Selecciona Banda 5 (Tolerancia)'
+            ];
+            
+            document.querySelector('.band-title').textContent = titles[band - 1];
+            
+            const colorGrid = document.getElementById('colorGrid');
+            colorGrid.innerHTML = '';
+            
+            Object.entries(colorCodes).forEach(([colorName, colorData]) => {
+                let includeColor = false;
+                
+                if (band <= 3 && colorData.value !== null) {
+                    includeColor = true;
+                } else if (band === 4) {
+                    includeColor = true;
+                } else if (band === 5 && colorData.tolerance !== null) {
+                    includeColor = true;
+                }
+                
+                if (includeColor) {
+                    const btn = document.createElement('div');
+                    btn.style.padding = '10px';
+                    btn.style.backgroundColor = colorData.hex;
+                    btn.style.color = colorData.hex === '#FFFF00' || colorData.hex === '#FFFFFF' ? '#000' : '#fff';
+                    btn.style.borderRadius = '10px';
+                    btn.style.cursor = 'pointer';
+                    btn.style.textAlign = 'center';
+                    btn.style.fontWeight = '600';
+                    btn.style.fontSize = '0.9em';
+                    btn.style.border = bandColors[band] === colorName ? '3px solid var(--primary)' : 'none';
+                    btn.textContent = colorName;
+                    btn.onclick = () => selectColor(colorName);
+                    colorGrid.appendChild(btn);
+                }
+            });
+        }
+
+        function selectColor(colorName) {
+            bandColors[selectedBand] = colorName;
+            updateResistorVisual();
+            
+            if (selectedBand < 5) {
+                selectBand(selectedBand + 1);
+            }
+        }
+
+        function updateResistorVisual() {
+            for (let i = 1; i <= 5; i++) {
+                const band = document.getElementById(`band${i}`);
+                if (bandColors[i]) {
+                    band.style.backgroundColor = colorCodes[bandColors[i]].hex;
+                } else {
+                    band.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+                }
+            }
+        }
+
+        function calculateManual() {
+            if (!bandColors[1] || !bandColors[2] || !bandColors[3]) {
+                showMessage('Selecciona al menos las primeras 3 bandas', 'error');
+                return;
+            }
+            
+            let result;
+            if (bandColors[5]) {
+                // 5 bandas
+                result = calculateFromColors([
+                    bandColors[1], bandColors[2], bandColors[3],
+                    bandColors[4] || 'Negro', bandColors[5]
+                ]);
+            } else {
+                // 4 bandas
+                result = calculateFromColors([
+                    bandColors[1], bandColors[2],
+                    bandColors[3], bandColors[4] || 'Dorado'
+                ]);
+            }
+            
+            const detectedColors = Object.values(bandColors)
+                .filter(c => c)
+                .map(c => colorCodes[c].rgb)
+                .map(rgb => ({r: rgb[0], g: rgb[1], b: rgb[2]}));
+            
+            displayResult(result, detectedColors, 'Selección Manual', 100);
+        }
+
+        // ============================================
+        // VISUALIZACIÓN DE RESULTADOS
+        // ============================================
+
+        function displayResult(result, detectedColors, method, confidence) {
+            // Formatear valor
+            let formattedValue = '';
+            const resistance = result.value;
+            
+            if (resistance >= 1000000) {
+                formattedValue = `${(resistance / 1000000).toFixed(2)} MΩ`;
+            } else if (resistance >= 1000) {
+                formattedValue = `${(resistance / 1000).toFixed(2)} kΩ`;
+            } else {
+                formattedValue = `${resistance.toFixed(2)} Ω`;
+            }
+            
+            // Estimar potencia
+            let power = '1/4 W';
+            if (resistance > 100000) power = '1/2 W';
+            if (resistance > 1000000) power = '1 W';
+            
+            // Mostrar resultado
+            document.getElementById('resultValue').textContent = formattedValue;
+            document.getElementById('toleranceValue').textContent = `±${result.tolerance || 20}%`;
+            document.getElementById('powerValue').textContent = power;
+            document.getElementById('methodUsed').textContent = method;
+            
+            // Mostrar colores detectados
+            const colorNames = result.colors || detectedColors.map(c => 
+                findClosestColorName(c)
+            );
+            
+            const colorsHTML = colorNames.map(name => 
+                `<span style="display: inline-block; margin: 0 5px;">
+                    ${name}
+                    <span style="display: inline-block; width: 20px; height: 20px; 
+                          background: ${colorCodes[name]?.hex || '#000'}; 
+                          border-radius: 5px; vertical-align: middle; margin-left: 5px;
+                          border: 1px solid rgba(255,255,255,0.3);"></span>
+                </span>`
+            ).join('');
+            
+            document.getElementById('colorsDetected').innerHTML = colorsHTML;
+            
+            // Mostrar barra de confianza
+            document.getElementById('confidenceBar').style.width = `${confidence}%`;
+            let confidenceText = '';
+            if (confidence >= 80) {
+                confidenceText = `Alta (${confidence.toFixed(0)}%)`;
+            } else if (confidence >= 50) {
+                confidenceText = `Media (${confidence.toFixed(0)}%)`;
+            } else {
+                confidenceText = `Baja (${confidence.toFixed(0)}%)`;
+            }
+            document.getElementById('confidenceText').textContent = `Confianza: ${confidenceText}`;
+            
+            document.getElementById('resultSection').style.display = 'block';
+            
+            // Agregar al historial
+            addToHistory(formattedValue, result.tolerance || 20, power, method, confidence);
+        }
+
+        function correctResult() {
+            // Cambiar a modo entrenamiento con los valores actuales
+            switchMode('training');
+            showMessage('Ingresa el valor correcto para entrenar el sistema', 'info');
+        }
+
+        // ============================================
+        // UTILIDADES
+        // ============================================
+
+        function switchMode(mode) {
+            currentMode = mode;
+            
+            // Actualizar botones
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Ocultar todas las secciones
+            document.getElementById('analyzeSection').style.display = 'none';
+            document.getElementById('trainingSection').style.display = 'none';
+            document.getElementById('manualSection').style.display = 'none';
+            
+            // Mostrar sección activa
+            if (mode === 'analyze') {
+                document.getElementById('analyzeSection').style.display = 'block';
+                document.getElementById('tipText').textContent = 
+                    'En el modo Análisis, marca el centro de cada banda de color tocando la imagen.';
+                resetAnalysis();
+            } else if (mode === 'training') {
+                document.getElementById('trainingSection').style.display = 'block';
+                document.getElementById('tipText').textContent = 
+                    'Entrena el sistema con resistencias de valor conocido para mejorar la precisión.';
+            } else if (mode === 'manual') {
+                document.getElementById('manualSection').style.display = 'block';
+                document.getElementById('tipText').textContent = 
+                    'Selecciona manualmente cada color de banda para calcular el valor.';
+                initManualMode();
+            }
+        }
+
+        function resetAnalysis() {
+            currentImage = null;
+            bandMarkers = [];
+            document.getElementById('uploadArea').style.display = 'block';
+            document.getElementById('photoCanvas').style.display = 'none';
+            document.getElementById('instructions').classList.remove('active');
+            document.getElementById('photoInput').value = '';
+            document.getElementById('analyzeBtn').disabled = true;
+            
+            // Reset pasos
+            document.querySelectorAll('.step').forEach(step => {
+                step.classList.remove('active', 'completed');
+            });
+        }
+
+        function updateStats() {
+            document.getElementById('patternsCount').textContent = learningDatabase.length;
+            document.getElementById('trainingSamples').textContent = learningDatabase.length;
+            
+            // Calcular precisión basada en uso
+            if (learningDatabase.length > 0) {
+                const avgConfidence = learningDatabase.reduce((acc, p) => 
+                    acc + p.confidence * p.usageCount, 0) / 
+                    Math.max(1, learningDatabase.reduce((acc, p) => acc + p.usageCount, 0));
+                document.getElementById('accuracyRate').textContent = 
+                    `${Math.min(95, 60 + learningDatabase.length * 2 + (avgConfidence || 0)).toFixed(0)}%`;
+            } else {
+                document.getElementById('accuracyRate').textContent = '0%';
+            }
+        }
+
+        function updatePatternDisplay() {
+            const list = document.getElementById('patternList');
+            
+            if (learningDatabase.length === 0) {
+                list.innerHTML = '<div class="message">No hay patrones aprendidos aún</div>';
+                return;
+            }
+            
+            list.innerHTML = learningDatabase.slice(-5).reverse().map(pattern => {
+                // Formatear valor
+                let value = pattern.actualValue;
+                let formatted = '';
+                if (value >= 1000000) {
+                    formatted = `${(value / 1000000).toFixed(2)} MΩ`;
+                } else if (value >= 1000) {
+                    formatted = `${(value / 1000).toFixed(2)} kΩ`;
+                } else {
+                    formatted = `${value.toFixed(0)} Ω`;
+                }
+                
+                return `
+                    <div class="pattern-item">
+                        <div>
+                            <strong>${formatted}</strong>
+                            <div style="font-size: 0.8em; opacity: 0.7;">
+                                Usado ${pattern.usageCount} veces
+                            </div>
+                        </div>
+                        <div class="pattern-colors">
+                            ${pattern.colors.map(c => 
+                                `<div class="pattern-color" 
+                                      style="background: rgb(${c.r},${c.g},${c.b})"></div>`
+                            ).join('')}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function clearPatterns() {
+            if (confirm('¿Eliminar todos los patrones aprendidos?')) {
+                learningDatabase = [];
+                saveLearningDatabase();
+                showMessage('Base de datos limpiada', 'success');
+            }
+        }
+
+        // ============================================
+        // EXPORTAR/IMPORTAR BASE DE DATOS
+        // ============================================
+
+        function exportDatabase() {
+            if (learningDatabase.length === 0) {
+                showMessage('No hay patrones para exportar', 'error');
+                return;
+            }
+            
+            // Preparar datos para exportar
+            const exportData = {
+                version: '2.0',
+                exportDate: new Date().toISOString(),
+                device: navigator.userAgent,
+                professor: 'Prof. Sergio - TEC Costa Rica',
+                patternsCount: learningDatabase.length,
+                patterns: learningDatabase,
+                metadata: {
+                    totalUsage: learningDatabase.reduce((acc, p) => acc + p.usageCount, 0),
+                    avgConfidence: learningDatabase.reduce((acc, p) => acc + p.confidence, 0) / learningDatabase.length,
+                    createdBy: 'ResistorVision 2.0 - ClaudIA & Prof. Sergio'
+                }
+            };
+            
+            // Crear archivo JSON
+            const dataStr = JSON.stringify(exportData, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+            
+            // Crear link de descarga
+            const exportName = `resistor_patterns_${new Date().toISOString().split('T')[0]}.json`;
+            const link = document.createElement('a');
+            link.setAttribute('href', dataUri);
+            link.setAttribute('download', exportName);
+            link.click();
+            
+            showMessage(`✅ Exportados ${learningDatabase.length} patrones`, 'success');
+            
+            // Mostrar info
+            showDatabaseInfo(exportData);
+        }
+
+        function importDatabase(input) {
+            const file = input.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importData = JSON.parse(e.target.result);
+                    
+                    // Validar formato
+                    if (!importData.version || !importData.patterns) {
+                        showMessage('Archivo inválido - no es una BD de ResistorVision', 'error');
+                        return;
+                    }
+                    
+                    // Mostrar diálogo de confirmación con información
+                    const info = `
+                        📊 Base de datos a importar:
+                        • Versión: ${importData.version}
+                        • Patrones: ${importData.patterns.length}
+                        • Fecha: ${new Date(importData.exportDate).toLocaleDateString()}
+                        • Dispositivo: ${importData.device ? importData.device.substring(0, 50) + '...' : 'Desconocido'}
+                        
+                        ¿Cómo quieres importar?
+                        [OK] = Fusionar con BD actual (recomendado)
+                        [Cancelar] = No importar
+                    `;
+                    
+                    if (confirm(info)) {
+                        mergeDatabase(importData.patterns);
+                    }
+                    
+                    // Mostrar información
+                    showDatabaseInfo(importData);
+                    
+                } catch (error) {
+                    showMessage('Error al leer el archivo', 'error');
+                    console.error(error);
+                }
+            };
+            reader.readAsText(file);
+            
+            // Limpiar input para permitir reimportar el mismo archivo
+            input.value = '';
+        }
+
+        function mergeDatabase(newPatterns) {
+            let added = 0;
+            let updated = 0;
+            
+            newPatterns.forEach(newPattern => {
+                // Buscar si ya existe un patrón similar
+                const existingIndex = learningDatabase.findIndex(existing => {
+                    // Comparar si es la misma resistencia (valor similar y colores similares)
+                    const valueDiff = Math.abs(existing.actualValue - newPattern.actualValue);
+                    const valueMatch = valueDiff < (existing.actualValue * 0.1); // 10% tolerancia
+                    
+                    if (!valueMatch) return false;
+                    
+                    // Comparar colores
+                    if (existing.colors.length !== newPattern.colors.length) return false;
+                    
+                    let colorMatch = true;
+                    for (let i = 0; i < existing.colors.length; i++) {
+                        const diff = Math.abs(existing.colors[i].r - newPattern.colors[i].r) +
+                                   Math.abs(existing.colors[i].g - newPattern.colors[i].g) +
+                                   Math.abs(existing.colors[i].b - newPattern.colors[i].b);
+                        if (diff > 100) { // Tolerancia de diferencia de color
+                            colorMatch = false;
+                            break;
+                        }
+                    }
+                    
+                    return colorMatch;
+                });
+                
+                if (existingIndex >= 0) {
+                    // Actualizar patrón existente (promediar confianza y sumar usos)
+                    learningDatabase[existingIndex].confidence = 
+                        (learningDatabase[existingIndex].confidence + newPattern.confidence) / 2;
+                    learningDatabase[existingIndex].usageCount += newPattern.usageCount;
+                    updated++;
+                } else {
+                    // Agregar nuevo patrón
+                    learningDatabase.push(newPattern);
+                    added++;
+                }
+            });
+            
+            saveLearningDatabase();
+            showMessage(`✅ Importación completa: ${added} nuevos, ${updated} actualizados`, 'success');
+            updateStats();
+        }
+
+        function shareDatabase() {
+            if (learningDatabase.length === 0) {
+                showMessage('No hay patrones para compartir', 'error');
+                return;
+            }
+            
+            // Crear datos para compartir (versión comprimida)
+            const shareData = {
+                v: '2.0',
+                d: new Date().toISOString().split('T')[0],
+                n: learningDatabase.length,
+                p: learningDatabase.map(p => ({
+                    c: p.colors, // colores
+                    v: Math.round(p.actualValue), // valor
+                    f: Math.round(p.confidence * 100) / 100 // confianza
+                }))
+            };
+            
+            const dataStr = JSON.stringify(shareData);
+            
+            // Opción 1: Copiar al portapapeles
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(dataStr).then(() => {
+                    showMessage('📋 BD copiada al portapapeles - Compártela por WhatsApp/Email', 'success');
+                }).catch(() => {
+                    // Fallback: mostrar en un textarea
+                    showShareDialog(dataStr);
+                });
+            } else {
+                // Fallback para navegadores sin soporte de clipboard
+                showShareDialog(dataStr);
+            }
+        }
+
+        function showShareDialog(dataStr) {
+            const dialog = document.createElement('div');
+            dialog.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: var(--dark);
+                border: 2px solid var(--learning);
+                border-radius: 15px;
+                padding: 20px;
+                z-index: 10000;
+                max-width: 90%;
+                width: 400px;
+            `;
+            
+            dialog.innerHTML = `
+                <h3 style="color: var(--learning); margin-bottom: 10px;">📱 Compartir Base de Datos</h3>
+                <p style="margin-bottom: 10px; font-size: 0.9em;">Copia este texto y compártelo:</p>
+                <textarea style="width: 100%; height: 150px; background: rgba(255,255,255,0.1); 
+                         color: white; border: 1px solid var(--learning); border-radius: 10px; 
+                         padding: 10px; font-family: monospace; font-size: 0.8em;" 
+                         readonly onclick="this.select()">${dataStr}</textarea>
+                <div style="margin-top: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <button class="btn btn-learning" onclick="
+                        document.querySelector('textarea').select();
+                        document.execCommand('copy');
+                        showMessage('Copiado al portapapeles', 'success');
+                    ">📋 Copiar</button>
+                    <button class="btn btn-secondary" onclick="this.parentElement.parentElement.remove()">
+                        ✖ Cerrar
+                    </button>
+                </div>
+                <p style="margin-top: 10px; font-size: 0.8em; opacity: 0.7;">
+                    💡 También puedes usar el botón "Exportar BD" para crear un archivo
+                </p>
+            `;
+            
+            document.body.appendChild(dialog);
+        }
+
+        function showDatabaseInfo(data) {
+            const infoDiv = document.getElementById('databaseInfo');
+            const content = document.getElementById('dbInfoContent');
+            
+            // Calcular estadísticas
+            const stats = calculateDatabaseStats(data.patterns || learningDatabase);
+            
+            content.innerHTML = `
+                <div style="display: grid; gap: 5px;">
+                    <div>📈 Total patrones: <strong>${stats.total}</strong></div>
+                    <div>🎯 Confianza promedio: <strong>${stats.avgConfidence.toFixed(1)}%</strong></div>
+                    <div>📊 Uso total: <strong>${stats.totalUsage} veces</strong></div>
+                    <div>🔬 Rango de valores: <strong>${stats.minValue} - ${stats.maxValue}</strong></div>
+                    <div>📅 Última actualización: <strong>${new Date(data.exportDate || Date.now()).toLocaleDateString()}</strong></div>
+                    ${data.professor ? `<div>👨‍🏫 Creador: <strong>${data.professor}</strong></div>` : ''}
+                </div>
+            `;
+            
+            infoDiv.style.display = 'block';
+            
+            // Ocultar después de 10 segundos
+            setTimeout(() => {
+                infoDiv.style.display = 'none';
+            }, 10000);
+        }
+
+        function calculateDatabaseStats(patterns) {
+            if (!patterns || patterns.length === 0) {
+                return {
+                    total: 0,
+                    avgConfidence: 0,
+                    totalUsage: 0,
+                    minValue: 'N/A',
+                    maxValue: 'N/A'
+                };
+            }
+            
+            const values = patterns.map(p => p.actualValue || p.v || 0);
+            const minVal = Math.min(...values);
+            const maxVal = Math.max(...values);
+            
+            return {
+                total: patterns.length,
+                avgConfidence: patterns.reduce((acc, p) => acc + (p.confidence || p.f || 1), 0) / patterns.length * 100,
+                totalUsage: patterns.reduce((acc, p) => acc + (p.usageCount || 0), 0),
+                minValue: formatResistanceValue(minVal),
+                maxValue: formatResistanceValue(maxVal)
+            };
+        }
+
+        function formatResistanceValue(value) {
+            if (value >= 1000000) {
+                return `${(value / 1000000).toFixed(1)}MΩ`;
+            } else if (value >= 1000) {
+                return `${(value / 1000).toFixed(1)}kΩ`;
+            } else {
+                return `${value.toFixed(0)}Ω`;
+            }
+        }
+
+        function importFromClipboard() {
+            // Función para pegar datos compartidos desde el portapapeles
+            if (navigator.clipboard && navigator.clipboard.readText) {
+                navigator.clipboard.readText().then(text => {
+                    try {
+                        const data = JSON.parse(text);
+                        if (data.v && data.p) {
+                            // Es un formato compartido comprimido
+                            const patterns = data.p.map(p => ({
+                                id: Date.now() + Math.random(),
+                                colors: p.c,
+                                actualValue: p.v,
+                                confidence: p.f || 1,
+                                timestamp: new Date().toISOString(),
+                                usageCount: 0
+                            }));
+                            
+                            mergeDatabase(patterns);
+                        } else {
+                            showMessage('El texto copiado no es una BD válida', 'error');
+                        }
+                    } catch (e) {
+                        showMessage('No hay una BD válida en el portapapeles', 'error');
+                    }
+                });
+            } else {
+                showMessage('Tu navegador no soporta pegar desde portapapeles', 'error');
+            }
+        }
+
+        function loadHistory() {
+            const saved = localStorage.getItem('resistorHistory');
+            if (saved) {
+                history = JSON.parse(saved);
+                updateHistoryDisplay();
+            }
+        }
+
+        function saveHistory() {
+            localStorage.setItem('resistorHistory', JSON.stringify(history));
+        }
+
+        function addToHistory(value, tolerance, power, method, confidence) {
+            const entry = {
+                value: value,
+                tolerance: tolerance,
+                power: power,
+                method: method,
+                confidence: confidence,
+                timestamp: new Date().toLocaleString('es-CR')
+            };
+            
+            history.unshift(entry);
+            if (history.length > 10) {
+                history = history.slice(0, 10);
+            }
+            
+            saveHistory();
+            updateHistoryDisplay();
+        }
+
+        function updateHistoryDisplay() {
+            const list = document.getElementById('historyList');
+            
+            if (history.length === 0) {
+                list.innerHTML = '<div class="message">No hay mediciones guardadas</div>';
+                return;
+            }
+            
+            list.innerHTML = history.map(entry => `
+                <div class="pattern-item">
+                    <div>
+                        <div style="font-size: 1.2em; font-weight: 700; color: var(--primary);">
+                            ${entry.value}
+                        </div>
+                        <div style="font-size: 0.9em; opacity: 0.7;">
+                            ${entry.method} • ${entry.confidence.toFixed(0)}% confianza
+                        </div>
+                    </div>
+                    <div style="font-size: 0.9em; opacity: 0.5;">
+                        ${entry.timestamp}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function clearHistory() {
+            if (confirm('¿Limpiar el historial de mediciones?')) {
+                history = [];
+                saveHistory();
+                updateHistoryDisplay();
+                showMessage('Historial limpiado', 'success');
+            }
+        }
+
+        function showMessage(text, type) {
+            const existingMessage = document.querySelector('.message:not(.info)');
+            if (existingMessage && existingMessage.parentElement.id !== 'trainingSection') {
+                existingMessage.remove();
+            }
+            
+            const message = document.createElement('div');
+            message.className = `message ${type}`;
+            message.textContent = text;
+            message.style.position = 'fixed';
+            message.style.top = '20px';
+            message.style.left = '50%';
+            message.style.transform = 'translateX(-50%)';
+            message.style.zIndex = '10000';
+            message.style.minWidth = '200px';
+            
+            document.body.appendChild(message);
+            
+            setTimeout(() => {
+                message.remove();
+            }, 3000);
+        }
+
+        function closeTutorial() {
+            document.getElementById('tutorialOverlay').style.display = 'none';
+            localStorage.setItem('tutorialShown', 'true');
+        }
+
+        // Prevenir zoom en dispositivos móviles
+        document.addEventListener('touchstart', function(e) {
+            if (e.touches.length > 1) {
+                e.preventDefault();
+            }
+        });
+    </script>
+</body>
+</html>

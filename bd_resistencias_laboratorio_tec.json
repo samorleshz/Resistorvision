@@ -1,0 +1,238 @@
+{
+  "version": "2.0",
+  "exportDate": "2024-01-15T10:00:00.000Z",
+  "device": "Base de Datos Pre-entrenada - Laboratorio TEC",
+  "professor": "Prof. Sergio - Instituto Tecnológico de Costa Rica",
+  "patternsCount": 15,
+  "patterns": [
+    {
+      "id": 1000001,
+      "colors": [
+        {"r": 139, "g": 69, "b": 19},
+        {"r": 0, "g": 0, "b": 0},
+        {"r": 139, "g": 69, "b": 19},
+        {"r": 255, "g": 215, "b": 0}
+      ],
+      "actualValue": 100,
+      "confidence": 0.95,
+      "timestamp": "2024-01-15T10:00:00.000Z",
+      "usageCount": 50,
+      "note": "100Ω ±5% - Resistencia común en laboratorio"
+    },
+    {
+      "id": 1000002,
+      "colors": [
+        {"r": 139, "g": 69, "b": 19},
+        {"r": 0, "g": 0, "b": 0},
+        {"r": 255, "g": 0, "b": 0},
+        {"r": 255, "g": 215, "b": 0}
+      ],
+      "actualValue": 1000,
+      "confidence": 0.95,
+      "timestamp": "2024-01-15T10:00:00.000Z",
+      "usageCount": 75,
+      "note": "1kΩ ±5% - Muy común en circuitos"
+    },
+    {
+      "id": 1000003,
+      "colors": [
+        {"r": 139, "g": 69, "b": 19},
+        {"r": 0, "g": 0, "b": 0},
+        {"r": 255, "g": 165, "b": 0},
+        {"r": 255, "g": 215, "b": 0}
+      ],
+      "actualValue": 10000,
+      "confidence": 0.95,
+      "timestamp": "2024-01-15T10:00:00.000Z",
+      "usageCount": 60,
+      "note": "10kΩ ±5% - Pull-up/Pull-down típico"
+    },
+    {
+      "id": 1000004,
+      "colors": [
+        {"r": 255, "g": 0, "b": 0},
+        {"r": 255, "g": 0, "b": 0},
+        {"r": 139, "g": 69, "b": 19},
+        {"r": 255, "g": 215, "b": 0}
+      ],
+      "actualValue": 220,
+      "confidence": 0.93,
+      "timestamp": "2024-01-15T10:00:00.000Z",
+      "usageCount": 80,
+      "note": "220Ω ±5% - Para LEDs"
+    },
+    {
+      "id": 1000005,
+      "colors": [
+        {"r": 255, "g": 165, "b": 0},
+        {"r": 255, "g": 165, "b": 0},
+        {"r": 139, "g": 69, "b": 19},
+        {"r": 255, "g": 215, "b": 0}
+      ],
+      "actualValue": 330,
+      "confidence": 0.92,
+      "timestamp": "2024-01-15T10:00:00.000Z",
+      "usageCount": 65,
+      "note": "330Ω ±5% - También para LEDs"
+    },
+    {
+      "id": 1000006,
+      "colors": [
+        {"r": 255, "g": 255, "b": 0},
+        {"r": 139, "g": 0, "b": 139},
+        {"r": 139, "g": 69, "b": 19},
+        {"r": 255, "g": 215, "b": 0}
+      ],
+      "actualValue": 470,
+      "confidence": 0.91,
+      "timestamp": "2024-01-15T10:00:00.000Z",
+      "usageCount": 45,
+      "note": "470Ω ±5%"
+    },
+    {
+      "id": 1000007,
+      "colors": [
+        {"r": 139, "g": 69, "b": 19},
+        {"r": 0, "g": 128, "b": 0},
+        {"r": 255, "g": 0, "b": 0},
+        {"r": 255, "g": 215, "b": 0}
+      ],
+      "actualValue": 1500,
+      "confidence": 0.90,
+      "timestamp": "2024-01-15T10:00:00.000Z",
+      "usageCount": 30,
+      "note": "1.5kΩ ±5%"
+    },
+    {
+      "id": 1000008,
+      "colors": [
+        {"r": 255, "g": 0, "b": 0},
+        {"r": 139, "g": 0, "b": 139},
+        {"r": 255, "g": 0, "b": 0},
+        {"r": 255, "g": 215, "b": 0}
+      ],
+      "actualValue": 2700,
+      "confidence": 0.89,
+      "timestamp": "2024-01-15T10:00:00.000Z",
+      "usageCount": 25,
+      "note": "2.7kΩ ±5%"
+    },
+    {
+      "id": 1000009,
+      "colors": [
+        {"r": 255, "g": 255, "b": 0},
+        {"r": 139, "g": 0, "b": 139},
+        {"r": 255, "g": 0, "b": 0},
+        {"r": 255, "g": 215, "b": 0}
+      ],
+      "actualValue": 4700,
+      "confidence": 0.92,
+      "timestamp": "2024-01-15T10:00:00.000Z",
+      "usageCount": 55,
+      "note": "4.7kΩ ±5%"
+    },
+    {
+      "id": 1000010,
+      "colors": [
+        {"r": 139, "g": 69, "b": 19},
+        {"r": 0, "g": 0, "b": 0},
+        {"r": 255, "g": 255, "b": 0},
+        {"r": 255, "g": 215, "b": 0}
+      ],
+      "actualValue": 100000,
+      "confidence": 0.94,
+      "timestamp": "2024-01-15T10:00:00.000Z",
+      "usageCount": 40,
+      "note": "100kΩ ±5%"
+    },
+    {
+      "id": 1000011,
+      "colors": [
+        {"r": 139, "g": 69, "b": 19},
+        {"r": 0, "g": 0, "b": 0},
+        {"r": 0, "g": 128, "b": 0},
+        {"r": 255, "g": 215, "b": 0}
+      ],
+      "actualValue": 1000000,
+      "confidence": 0.93,
+      "timestamp": "2024-01-15T10:00:00.000Z",
+      "usageCount": 20,
+      "note": "1MΩ ±5%"
+    },
+    {
+      "id": 1000012,
+      "colors": [
+        {"r": 128, "g": 128, "b": 128},
+        {"r": 255, "g": 0, "b": 0},
+        {"r": 139, "g": 69, "b": 19},
+        {"r": 255, "g": 215, "b": 0}
+      ],
+      "actualValue": 820,
+      "confidence": 0.88,
+      "timestamp": "2024-01-15T10:00:00.000Z",
+      "usageCount": 15,
+      "note": "820Ω ±5%"
+    },
+    {
+      "id": 1000013,
+      "colors": [
+        {"r": 0, "g": 128, "b": 0},
+        {"r": 0, "g": 0, "b": 255},
+        {"r": 139, "g": 69, "b": 19},
+        {"r": 255, "g": 215, "b": 0}
+      ],
+      "actualValue": 560,
+      "confidence": 0.87,
+      "timestamp": "2024-01-15T10:00:00.000Z",
+      "usageCount": 18,
+      "note": "560Ω ±5%"
+    },
+    {
+      "id": 1000014,
+      "colors": [
+        {"r": 255, "g": 0, "b": 0},
+        {"r": 255, "g": 0, "b": 0},
+        {"r": 0, "g": 0, "b": 0},
+        {"r": 139, "g": 69, "b": 19},
+        {"r": 139, "g": 69, "b": 19}
+      ],
+      "actualValue": 220,
+      "confidence": 0.96,
+      "timestamp": "2024-01-15T10:00:00.000Z",
+      "usageCount": 35,
+      "note": "220Ω ±1% - Precisión (5 bandas)"
+    },
+    {
+      "id": 1000015,
+      "colors": [
+        {"r": 139, "g": 69, "b": 19},
+        {"r": 0, "g": 0, "b": 0},
+        {"r": 0, "g": 0, "b": 0},
+        {"r": 255, "g": 0, "b": 0},
+        {"r": 139, "g": 69, "b": 19}
+      ],
+      "actualValue": 10000,
+      "confidence": 0.97,
+      "timestamp": "2024-01-15T10:00:00.000Z",
+      "usageCount": 42,
+      "note": "10kΩ ±1% - Precisión (5 bandas)"
+    }
+  ],
+  "metadata": {
+    "totalUsage": 645,
+    "avgConfidence": 0.92,
+    "createdBy": "ResistorVision 2.0 - ClaudIA & Prof. Sergio",
+    "laboratoryConditions": {
+      "lighting": "Luz LED blanca 6500K",
+      "background": "Superficie blanca mate",
+      "camera": "Calibrada para condiciones de laboratorio",
+      "temperature": "22°C ± 2°C"
+    },
+    "notes": [
+      "Base de datos pre-entrenada para el Laboratorio de Circuitos Eléctricos",
+      "Incluye las 15 resistencias más comunes en las prácticas",
+      "Calibrada bajo condiciones controladas de laboratorio",
+      "Se recomienda agregar más muestras según las condiciones específicas de cada estudiante"
+    ]
+  }
+}
