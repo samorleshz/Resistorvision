@@ -200,6 +200,31 @@
             display: none;
             margin-bottom: 20px;
             background: #000;
+            touch-action: none; /* Prevenir gestos del navegador en táctil */
+            user-select: none; /* Prevenir selección de texto */
+            -webkit-user-select: none;
+            -webkit-touch-callout: none; /* Prevenir menú contextual en iOS */
+            position: relative;
+            border: 2px solid transparent;
+            transition: border-color 0.3s ease;
+        }
+        
+        #photoCanvas:hover {
+            border-color: var(--primary);
+        }
+        
+        #photoCanvas.ready {
+            border-color: var(--primary);
+            animation: readyPulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes readyPulse {
+            0%, 100% { 
+                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5); 
+            }
+            50% { 
+                box-shadow: 0 10px 40px rgba(0, 255, 136, 0.3); 
+            }
         }
 
         .photo-upload-area {
@@ -776,6 +801,12 @@
 
             <canvas id="photoCanvas"></canvas>
             <canvas id="selectionCanvas" style="display: none;"></canvas>
+            
+            <!-- Área de debug para verificar eventos -->
+            <div id="debugInfo" style="display: block; background: rgba(255,0,255,0.1); padding: 10px; border-radius: 10px; margin: 10px 0; font-family: monospace; font-size: 0.9em; border: 1px solid var(--learning);">
+                <div>🐛 Debug Mode ON: <span id="debugText">Esperando interacción...</span></div>
+                <div style="font-size: 0.8em; opacity: 0.7; margin-top: 5px;">Si ves coordenadas al tocar pero no se marcan bandas, reporta el mensaje</div>
+            </div>
 
             <div class="photo-instructions" id="instructions">
                 <div class="step" id="step1">
@@ -802,6 +833,11 @@
             
             <button class="btn btn-secondary" onclick="resetAnalysis()">
                 🔄 Nueva Foto
+            </button>
+            
+            <!-- Botón de emergencia para marcar manualmente -->
+            <button class="btn btn-secondary" onclick="addManualMarker()" id="manualMarkerBtn" style="display: none;">
+                📍 Agregar Marcador Manual
             </button>
 
             <button class="btn btn-learning" onclick="switchMode('training')">
@@ -1167,6 +1203,20 @@
                     // Reset marcadores
                     bandMarkers = [];
                     updateAnalysisUI();
+                    
+                    // Mostrar mensaje de éxito con instrucciones claras
+                    setTimeout(() => {
+                        showMessage('✅ Foto cargada - Ahora TOCA o HAZ CLICK sobre cada banda de color', 'success');
+                        
+                        // Agregar indicador visual de que está listo
+                        const canvas = document.getElementById('photoCanvas');
+                        canvas.classList.add('ready');
+                        
+                        // Remover el indicador después de 3 segundos
+                        setTimeout(() => {
+                            canvas.classList.remove('ready');
+                        }, 3000);
+                    }, 500);
                 };
                 img.src = e.target.result;
             };
@@ -1194,12 +1244,14 @@
             // Activar pasos
             document.getElementById('step1').classList.add('completed');
             document.getElementById('step2').classList.add('active');
-        }
-
-        function setupCanvasEvents() {
-            const canvas = document.getElementById('photoCanvas');
             
-            canvas.addEventListener('click', function(e) {
+            // IMPORTANTE: Configurar eventos del canvas DESPUÉS de mostrar la imagen
+            canvas.onclick = function(e) {
+                // Debug
+                const debugDiv = document.getElementById('debugInfo');
+                debugDiv.style.display = 'block';
+                document.getElementById('debugText').textContent = `Click detectado en X:${e.clientX}, Y:${e.clientY}`;
+                
                 if (!currentImage || bandMarkers.length >= 5) return;
                 
                 const rect = canvas.getBoundingClientRect();
@@ -1208,10 +1260,30 @@
                 
                 // Agregar marcador
                 addBandMarker(x, y);
-            });
+            };
             
-            // Mostrar tooltip al mover el mouse
-            canvas.addEventListener('mousemove', function(e) {
+            // Para dispositivos táctiles
+            canvas.ontouchstart = function(e) {
+                e.preventDefault(); // Prevenir scroll
+                
+                // Debug
+                const debugDiv = document.getElementById('debugInfo');
+                debugDiv.style.display = 'block';
+                const touch = e.touches[0];
+                document.getElementById('debugText').textContent = `Touch detectado en X:${touch.clientX}, Y:${touch.clientY}`;
+                
+                if (!currentImage || bandMarkers.length >= 5) return;
+                
+                const rect = canvas.getBoundingClientRect();
+                const x = touch.clientX - rect.left;
+                const y = touch.clientY - rect.top;
+                
+                // Agregar marcador
+                addBandMarker(x, y);
+            };
+            
+            // Mostrar tooltip al mover el mouse (solo desktop)
+            canvas.onmousemove = function(e) {
                 if (!currentImage) return;
                 
                 const rect = canvas.getBoundingClientRect();
@@ -1227,19 +1299,39 @@
                 tooltip.style.left = e.clientX + 10 + 'px';
                 tooltip.style.top = e.clientY - 30 + 'px';
                 tooltip.classList.add('active');
-            });
+            };
             
-            canvas.addEventListener('mouseleave', function() {
+            canvas.onmouseleave = function() {
                 document.getElementById('tooltip').classList.remove('active');
-            });
+            };
+        }
+
+        function setupCanvasEvents() {
+            // Los eventos ahora se configuran en displayImageForAnalysis()
+            // Esta función se mantiene vacía por compatibilidad
         }
 
         function addBandMarker(x, y) {
             const canvas = document.getElementById('photoCanvas');
             const ctx = canvas.getContext('2d');
             
+            // Debug - confirmar que la función se ejecuta
+            console.log(`Marcador agregado en: ${x}, ${y}`);
+            
+            // Verificar límites
+            if (x < 0 || y < 0 || x > canvas.width || y > canvas.height) {
+                console.log('Click fuera del canvas');
+                return;
+            }
+            
             // Obtener color en ese punto (promedio de área 10x10)
-            const imageData = ctx.getImageData(Math.max(0, x - 5), Math.max(0, y - 5), 10, 10);
+            const sampleSize = 10;
+            const startX = Math.max(0, Math.floor(x - sampleSize/2));
+            const startY = Math.max(0, Math.floor(y - sampleSize/2));
+            const width = Math.min(sampleSize, canvas.width - startX);
+            const height = Math.min(sampleSize, canvas.height - startY);
+            
+            const imageData = ctx.getImageData(startX, startY, width, height);
             const pixels = imageData.data;
             
             let r = 0, g = 0, b = 0, count = 0;
@@ -1268,12 +1360,23 @@
             drawMarkers();
             updateAnalysisUI();
             
-            // Vibración táctil si está disponible
+            // Vibración táctil si está disponible (para móviles)
             if (navigator.vibrate) {
                 navigator.vibrate(50);
             }
             
-            showMessage(`Banda ${bandMarkers.length} marcada`, 'info');
+            // Agregar clase para indicar que el canvas está listo
+            canvas.classList.add('ready');
+            
+            // Mensaje de retroalimentación mejorado
+            const colorName = findClosestColorName(avgColor);
+            showMessage(`Banda ${bandMarkers.length} marcada - Color detectado: ${colorName}`, 'info');
+            
+            // Si ya tenemos 5 bandas, mostrar mensaje
+            if (bandMarkers.length >= 5) {
+                showMessage('✅ Máximo de bandas alcanzado. Presiona "Analizar"', 'success');
+                canvas.style.cursor = 'not-allowed';
+            }
         }
 
         function drawMarkers() {
@@ -1826,7 +1929,19 @@
             document.querySelectorAll('.mode-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
-            event.target.classList.add('active');
+            // Manejar el caso cuando event no está definido
+            if (event && event.target) {
+                event.target.classList.add('active');
+            } else {
+                // Buscar y activar el botón correcto
+                document.querySelectorAll('.mode-btn').forEach(btn => {
+                    if ((mode === 'analyze' && btn.textContent.includes('Analizar')) ||
+                        (mode === 'training' && btn.textContent.includes('Entrenar')) ||
+                        (mode === 'manual' && btn.textContent.includes('Manual'))) {
+                        btn.classList.add('active');
+                    }
+                });
+            }
             
             // Ocultar todas las secciones
             document.getElementById('analyzeSection').style.display = 'none';
@@ -1838,7 +1953,10 @@
                 document.getElementById('analyzeSection').style.display = 'block';
                 document.getElementById('tipText').textContent = 
                     'En el modo Análisis, marca el centro de cada banda de color tocando la imagen.';
-                resetAnalysis();
+                // Solo resetear si no hay imagen actual
+                if (!currentImage) {
+                    resetAnalysis();
+                }
             } else if (mode === 'training') {
                 document.getElementById('trainingSection').style.display = 'block';
                 document.getElementById('tipText').textContent = 
@@ -2323,12 +2441,55 @@
             localStorage.setItem('tutorialShown', 'true');
         }
 
+        // Función de emergencia para agregar marcador manual
+        function addManualMarker() {
+            if (!currentImage || bandMarkers.length >= 5) {
+                showMessage('No hay imagen o ya tienes 5 bandas marcadas', 'error');
+                return;
+            }
+            
+            const canvas = document.getElementById('photoCanvas');
+            const bandNum = bandMarkers.length + 1;
+            
+            // Pedir al usuario las coordenadas aproximadas
+            const position = prompt(`Banda ${bandNum}: Indica la posición\n1=Izquierda, 2=Centro-Izq, 3=Centro, 4=Centro-Der, 5=Derecha`);
+            
+            if (position && position >= 1 && position <= 5) {
+                const x = (canvas.width / 6) * parseInt(position);
+                const y = canvas.height / 2;
+                addBandMarker(x, y);
+            }
+        }
+
+        // Detectar problemas con eventos y mostrar botón de emergencia
+        document.addEventListener('DOMContentLoaded', () => {
+            loadLearningDatabase();
+            loadHistory();
+            updateStats();
+            
+            // Mostrar tutorial si es primera vez
+            if (!localStorage.getItem('tutorialShown')) {
+                document.getElementById('tutorialOverlay').style.display = 'flex';
+            }
+            
+            // Configurar canvas para marcadores
+            setupCanvasEvents();
+            
+            // Detectar si los eventos no funcionan después de 5 segundos
+            setTimeout(() => {
+                const canvas = document.getElementById('photoCanvas');
+                if (canvas.style.display === 'block' && bandMarkers.length === 0) {
+                    document.getElementById('manualMarkerBtn').style.display = 'block';
+                    showMessage('⚠️ Si no puedes marcar bandas tocando, usa el botón "Agregar Marcador Manual"', 'info');
+                }
+            }, 5000);
+        });
+
         // Prevenir zoom en dispositivos móviles
         document.addEventListener('touchstart', function(e) {
             if (e.touches.length > 1) {
                 e.preventDefault();
             }
         });
-    </script>
 </body>
 </html>
