@@ -3,174 +3,125 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ResistorVision 2.1 - Sistema de Detección con Aprendizaje</title>
+    <title>ResistorVision 2.2 - Mobile First</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Exo+2:wght@300;600;900&display=swap');
-        
-        :root {
-            --primary: #00ff88;
-            --secondary: #ff6b35;
-            --dark: #0a0e27;
-            --darker: #050714;
-            --light: #e8f4fd;
-            --circuit: #ffd700;
-            --error: #ff3366;
-            --success: #00ff88;
-            --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --circuit-gradient: linear-gradient(45deg, #00ff88, #00ccff);
-            --learning: #ff00ff;
-        }
-
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            font-family: 'Exo 2', sans-serif;
-            background: var(--darker);
-            color: var(--light);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: #0a0e27;
+            color: #e8f4fd;
             min-height: 100vh;
-            overflow-x: hidden;
-            position: relative;
-        }
-
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: 
-                repeating-linear-gradient(0deg, transparent, transparent 50px, rgba(0, 255, 136, 0.03) 50px, rgba(0, 255, 136, 0.03) 51px),
-                repeating-linear-gradient(90deg, transparent, transparent 50px, rgba(0, 204, 255, 0.03) 50px, rgba(0, 204, 255, 0.03) 51px);
-            pointer-events: none;
-            z-index: 1;
+            padding: 10px;
         }
 
         .container {
-            max-width: 600px;
+            max-width: 100%;
             margin: 0 auto;
-            padding: 20px;
-            position: relative;
-            z-index: 2;
         }
 
         header {
             text-align: center;
-            padding: 30px 0;
+            padding: 20px 0;
         }
 
         h1 {
-            font-size: 2.5em;
-            font-weight: 900;
-            background: var(--circuit-gradient);
+            font-size: 1.8em;
+            font-weight: bold;
+            background: linear-gradient(45deg, #00ff88, #00ccff);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            margin-bottom: 10px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        .version-badge {
-            display: inline-block;
-            background: var(--learning);
-            color: var(--dark);
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 0.8em;
-            font-weight: 700;
-            margin-bottom: 10px;
-        }
-
-        .subtitle {
-            color: var(--primary);
-            font-size: 1.1em;
-            font-weight: 300;
             margin-bottom: 5px;
         }
 
-        .credits {
+        .subtitle {
+            color: #00ff88;
             font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+
+        .credits {
+            font-size: 0.8em;
             color: rgba(255, 255, 255, 0.6);
-            margin-top: 10px;
-            font-family: 'Space Mono', monospace;
         }
 
         .credits span {
-            color: var(--primary);
-            font-weight: 700;
+            color: #00ff88;
+            font-weight: bold;
         }
 
-        .learning-stats {
-            background: rgba(255, 0, 255, 0.1);
-            border: 1px solid var(--learning);
-            border-radius: 15px;
-            padding: 15px;
-            margin: 20px 0;
+        /* Stats */
+        .stats {
             display: flex;
             justify-content: space-around;
-            backdrop-filter: blur(10px);
+            background: rgba(255, 0, 255, 0.1);
+            border: 1px solid #ff00ff;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
         }
 
-        .stat-item {
+        .stat {
             text-align: center;
         }
 
         .stat-value {
-            font-size: 1.5em;
-            font-weight: 700;
-            color: var(--learning);
-            font-family: 'Space Mono', monospace;
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #ff00ff;
         }
 
         .stat-label {
-            font-size: 0.8em;
+            font-size: 0.7em;
             color: rgba(255, 255, 255, 0.7);
             text-transform: uppercase;
         }
 
+        /* Tabs */
         .tabs {
             display: flex;
-            gap: 10px;
-            margin-bottom: 30px;
+            gap: 5px;
+            margin: 20px 0;
             background: rgba(255, 255, 255, 0.05);
             padding: 5px;
-            border-radius: 15px;
-            backdrop-filter: blur(10px);
+            border-radius: 10px;
         }
 
         .tab {
             flex: 1;
-            padding: 12px;
+            padding: 12px 5px;
             border: none;
             background: transparent;
-            color: var(--light);
-            font-size: 0.9em;
+            color: #fff;
+            font-size: 0.85em;
             font-weight: 600;
             cursor: pointer;
-            border-radius: 10px;
-            transition: all 0.3s ease;
-            font-family: 'Exo 2', sans-serif;
+            border-radius: 8px;
+            transition: all 0.3s;
             text-transform: uppercase;
-            letter-spacing: 1px;
         }
 
         .tab.active {
-            background: var(--circuit-gradient);
-            color: var(--dark);
-            box-shadow: 0 4px 20px rgba(0, 255, 136, 0.3);
+            background: linear-gradient(45deg, #00ff88, #00ccff);
+            color: #0a0e27;
         }
 
+        .tab:not(.active):hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Sections */
         .section {
             display: none;
             background: rgba(255, 255, 255, 0.05);
-            border-radius: 20px;
-            padding: 20px;
-            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 15px;
             border: 1px solid rgba(0, 255, 136, 0.2);
         }
 
@@ -178,385 +129,430 @@
             display: block;
         }
 
-        #photoCanvas {
-            width: 100%;
-            max-width: 100%;
-            border-radius: 15px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-            cursor: crosshair;
-            display: none;
-            margin-bottom: 20px;
-            background: #000;
-            border: 2px solid var(--primary);
-        }
-
-        .upload-btn {
-            width: 100%;
-            padding: 40px;
-            border: 3px dashed var(--primary);
-            border-radius: 15px;
+        /* Upload button */
+        .upload-area {
+            border: 2px dashed #00ff88;
+            border-radius: 10px;
+            padding: 30px 20px;
+            text-align: center;
             background: rgba(0, 255, 136, 0.05);
             cursor: pointer;
-            text-align: center;
-            transition: all 0.3s ease;
+            transition: all 0.3s;
         }
 
-        .upload-btn:hover {
+        .upload-area:hover {
             background: rgba(0, 255, 136, 0.1);
-            transform: scale(1.02);
         }
 
-        .btn {
+        .upload-icon {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        /* Canvas para foto */
+        #photoCanvas, #trainingCanvas {
             width: 100%;
-            padding: 15px;
-            border: none;
+            height: auto;
+            max-width: 100%;
             border-radius: 10px;
-            font-size: 1.1em;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-family: 'Exo 2', sans-serif;
-            margin: 5px 0;
+            margin: 15px 0;
+            display: none;
+            border: 2px solid #00ff88;
+            cursor: crosshair;
         }
 
-        .btn-primary {
-            background: var(--circuit-gradient);
-            color: var(--dark);
-            box-shadow: 0 5px 20px rgba(0, 255, 136, 0.3);
-        }
-
-        .btn-primary:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 7px 30px rgba(0, 255, 136, 0.5);
-        }
-
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--light);
-            border: 2px solid var(--primary);
-        }
-
-        .btn-learning {
-            background: linear-gradient(45deg, var(--learning), #ff00ff88);
-            color: var(--light);
-            border: 2px solid var(--learning);
-        }
-
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .message {
-            padding: 15px;
-            border-radius: 10px;
-            margin: 10px 0;
-            text-align: center;
-        }
-
-        .message.error {
-            background: rgba(255, 51, 102, 0.1);
-            border: 1px solid var(--error);
-            color: var(--error);
-        }
-
-        .message.success {
-            background: rgba(0, 255, 136, 0.1);
-            border: 1px solid var(--success);
-            color: var(--success);
-        }
-
-        .message.info {
-            background: rgba(0, 204, 255, 0.1);
-            border: 1px solid #00ccff;
-            color: #00ccff;
-        }
-
-        .marker {
-            position: absolute;
-            width: 40px;
-            height: 40px;
-            border: 3px solid var(--primary);
-            border-radius: 50%;
-            background: rgba(0, 255, 136, 0.3);
-            transform: translate(-50%, -50%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            color: white;
-            font-size: 14px;
-            text-shadow: 1px 1px 2px black;
-            pointer-events: none;
-        }
-
+        /* Instructions */
         .instructions {
             background: rgba(255, 255, 255, 0.1);
             border-radius: 10px;
             padding: 15px;
             margin: 15px 0;
+            display: none;
+        }
+
+        .instructions.active {
+            display: block;
         }
 
         .step {
-            margin: 10px 0;
+            padding: 8px 0;
             opacity: 0.6;
         }
 
         .step.active {
             opacity: 1;
-            color: var(--primary);
+            color: #00ff88;
         }
 
+        /* Buttons */
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 8px 0;
+            text-transform: uppercase;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #00ff88, #00ccff);
+            color: #0a0e27;
+        }
+
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border: 2px solid #00ff88;
+        }
+
+        .btn-learning {
+            background: linear-gradient(45deg, #ff00ff, #ff00ff88);
+            color: #fff;
+        }
+
+        /* Inputs */
+        input[type="number"], select {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border: 1px solid #ff00ff;
+            font-size: 1em;
+        }
+
+        /* Result */
         .result {
             background: rgba(255, 255, 255, 0.05);
-            border-radius: 20px;
-            padding: 25px;
-            margin-top: 20px;
-            backdrop-filter: blur(10px);
-            border: 2px solid var(--primary);
-            box-shadow: 0 10px 40px rgba(0, 255, 136, 0.2);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 15px;
+            border: 2px solid #00ff88;
+            text-align: center;
         }
 
         .result-value {
-            font-size: 2.5em;
-            font-weight: 900;
-            color: var(--primary);
-            text-align: center;
-            margin-bottom: 15px;
-            font-family: 'Space Mono', monospace;
-            text-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+            font-size: 2em;
+            font-weight: bold;
+            color: #00ff88;
+            margin-bottom: 10px;
         }
 
-        /* Manual mode */
-        .resistor-visual {
-            width: 100%;
-            max-width: 400px;
-            height: 100px;
-            margin: 20px auto;
-            position: relative;
-            background: linear-gradient(90deg, #d4a574 0%, #c19660 50%, #d4a574 100%);
-            border-radius: 20px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        /* Manual mode resistor */
+        .resistor {
             display: flex;
-            align-items: center;
             justify-content: center;
-            gap: 15px;
-            padding: 0 30px;
+            align-items: center;
+            gap: 10px;
+            padding: 20px;
+            background: linear-gradient(90deg, #d4a574, #c19660, #d4a574);
+            border-radius: 15px;
+            margin: 20px 0;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
         }
 
         .band {
-            width: 15px;
-            height: 80%;
-            border-radius: 3px;
-            border: 1px solid rgba(0, 0, 0, 0.2);
+            width: 12px;
+            height: 60px;
+            border-radius: 2px;
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(0,0,0,0.3);
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);
-            background: rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s;
         }
 
         .band:hover {
             transform: scale(1.1);
         }
 
+        .band.selected {
+            border: 2px solid #00ff88;
+            box-shadow: 0 0 10px #00ff88;
+        }
+
+        /* Color grid */
         .color-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            margin: 20px 0;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin: 15px 0;
         }
 
         .color-btn {
-            padding: 10px;
-            border-radius: 10px;
-            cursor: pointer;
+            padding: 10px 5px;
+            border-radius: 8px;
             text-align: center;
+            font-size: 0.85em;
             font-weight: 600;
-            font-size: 0.9em;
             border: 2px solid transparent;
-            transition: all 0.3s ease;
+            cursor: pointer;
+            transition: all 0.3s;
         }
 
-        .color-btn:hover {
-            transform: scale(1.05);
-            border-color: var(--primary);
+        .color-btn:active {
+            transform: scale(0.95);
         }
 
         .color-btn.selected {
-            border-color: var(--primary);
-            box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+            border-color: #00ff88;
+            box-shadow: 0 0 10px rgba(0,255,136,0.5);
         }
 
-        @media (max-width: 480px) {
-            h1 { font-size: 1.8em; }
-            .color-grid { grid-template-columns: repeat(3, 1fr); }
+        /* Messages */
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 20px;
+            border-radius: 10px;
+            z-index: 1000;
+            animation: slideDown 0.3s ease;
+            font-size: 0.9em;
+            min-width: 200px;
+            text-align: center;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        .toast.success {
+            background: rgba(0, 255, 136, 0.9);
+            color: #0a0e27;
+        }
+
+        .toast.error {
+            background: rgba(255, 51, 102, 0.9);
+            color: #fff;
+        }
+
+        .toast.info {
+            background: rgba(0, 204, 255, 0.9);
+            color: #0a0e27;
+        }
+
+        /* History */
+        .history-item {
+            background: rgba(255,255,255,0.05);
+            padding: 12px;
+            border-radius: 10px;
+            margin: 8px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .history-value {
+            font-weight: bold;
+            color: #00ff88;
+        }
+
+        .history-time {
+            font-size: 0.8em;
+            opacity: 0.7;
+        }
+
+        /* DB Controls */
+        .db-controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        /* Fix for iOS */
+        input[type="file"] {
+            display: none;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 360px) {
+            h1 { font-size: 1.5em; }
+            .tab { font-size: 0.75em; padding: 10px 3px; }
+            .color-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (min-width: 768px) {
+            .container { max-width: 600px; }
+            .color-grid { grid-template-columns: repeat(4, 1fr); }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <div class="version-badge">v2.1 FIXED</div>
             <h1>ResistorVision</h1>
-            <div class="subtitle">Sistema Inteligente de Detección con Aprendizaje</div>
+            <div class="subtitle">v2.2 Mobile</div>
             <div class="credits">
-                Creado por <span>ClaudIA</span> y <span>Prof. Sergio</span>
+                Por <span>ClaudIA</span> y <span>Prof. Sergio</span>
             </div>
         </header>
 
-        <!-- Estadísticas -->
-        <div class="learning-stats">
-            <div class="stat-item">
+        <div class="stats">
+            <div class="stat">
                 <div class="stat-value" id="patternsCount">0</div>
                 <div class="stat-label">Patrones</div>
             </div>
-            <div class="stat-item">
+            <div class="stat">
                 <div class="stat-value" id="accuracyRate">0%</div>
                 <div class="stat-label">Precisión</div>
             </div>
-            <div class="stat-item">
+            <div class="stat">
                 <div class="stat-value" id="samplesCount">0</div>
                 <div class="stat-label">Muestras</div>
             </div>
         </div>
 
-        <!-- Tabs -->
         <div class="tabs">
-            <button class="tab active" data-tab="analyze">🔍 Analizar</button>
-            <button class="tab" data-tab="training">🧠 Entrenar</button>
-            <button class="tab" data-tab="manual">✋ Manual</button>
+            <button class="tab active" onclick="openTab('analyze', this)">🔍 Analizar</button>
+            <button class="tab" onclick="openTab('training', this)">🧠 Entrenar</button>
+            <button class="tab" onclick="openTab('manual', this)">✋ Manual</button>
         </div>
 
-        <!-- Sección Analizar -->
+        <!-- ANALIZAR -->
         <div id="analyze" class="section active">
-            <div id="uploadDiv">
-                <label for="photoFile" class="upload-btn">
-                    <div style="font-size: 3em;">📷</div>
-                    <div style="margin: 10px 0; font-size: 1.2em; font-weight: 600;">
-                        Toca para tomar o seleccionar foto
-                    </div>
-                    <div style="font-size: 0.9em; opacity: 0.7;">
-                        Coloca la resistencia horizontal con buena luz
-                    </div>
-                </label>
-                <input type="file" id="photoFile" accept="image/*" capture="environment" style="display: none;">
+            <div id="uploadArea" class="upload-area" onclick="document.getElementById('photoInput').click()">
+                <div class="upload-icon">📷</div>
+                <div>Toca para tomar o seleccionar foto</div>
+                <div style="font-size: 0.8em; opacity: 0.7; margin-top: 5px;">
+                    Coloca la resistencia horizontal con buena luz
+                </div>
             </div>
-
+            <input type="file" id="photoInput" accept="image/*" capture="environment">
+            
             <canvas id="photoCanvas"></canvas>
-            <div id="markersContainer" style="position: relative;"></div>
-
-            <div id="photoInstructions" class="instructions" style="display: none;">
-                <div class="step active">📸 Foto cargada</div>
-                <div class="step" id="step2">👆 Toca el centro de cada banda de color</div>
-                <div class="step" id="step3">📍 Marca de 3 a 5 bandas en orden</div>
-                <div class="step" id="step4">✅ Presiona Analizar cuando termines</div>
+            
+            <div id="instructions" class="instructions">
+                <div class="step" id="s1">📸 Foto cargada</div>
+                <div class="step" id="s2">👆 Toca el centro de cada banda</div>
+                <div class="step" id="s3">📍 Marca 3-5 bandas en orden</div>
+                <div class="step" id="s4">✅ Presiona Analizar</div>
             </div>
-
+            
             <div id="analyzeControls" style="display: none;">
-                <button class="btn btn-primary" id="analyzeBtn" disabled>
+                <button class="btn btn-primary" id="analyzeBtn" disabled onclick="analyzeResistor()">
                     🎯 Analizar Resistencia
                 </button>
-                <button class="btn btn-secondary" id="resetBtn">
+                <button class="btn btn-secondary" onclick="resetAnalysis()">
                     🔄 Nueva Foto
                 </button>
             </div>
-
+            
             <div id="analysisResult"></div>
         </div>
 
-        <!-- Sección Entrenar -->
+        <!-- ENTRENAR -->
         <div id="training" class="section">
-            <div class="message info">
-                Entrena el sistema con resistencias de valor conocido
+            <div style="background: rgba(255,0,255,0.1); padding: 12px; border-radius: 10px; margin-bottom: 15px;">
+                💡 Entrena con resistencias de valor conocido
             </div>
             
-            <div style="margin: 20px 0;">
-                <label>Valor conocido:</label>
-                <input type="number" id="knownValue" placeholder="ej: 1000" style="width: 100%; padding: 10px; margin: 10px 0; border-radius: 10px; background: rgba(255,255,255,0.1); color: white; border: 1px solid var(--learning);">
-                
-                <label>Unidad:</label>
-                <select id="knownUnit" style="width: 100%; padding: 10px; margin: 10px 0; border-radius: 10px; background: rgba(255,255,255,0.1); color: white; border: 1px solid var(--learning);">
-                    <option value="1">Ω (Ohms)</option>
-                    <option value="1000">kΩ (Kilohms)</option>
-                    <option value="1000000">MΩ (Megaohms)</option>
-                </select>
-                
-                <button class="btn btn-learning" onclick="startTraining()">
-                    📸 Tomar Foto para Entrenar
-                </button>
-            </div>
-
-            <canvas id="trainingCanvas" style="display: none; width: 100%; border-radius: 15px; margin: 20px 0;"></canvas>
+            <input type="number" id="knownValue" placeholder="Valor (ej: 1000)">
+            
+            <select id="knownUnit">
+                <option value="1">Ω (Ohms)</option>
+                <option value="1000">kΩ (Kilohms)</option>
+                <option value="1000000">MΩ (Megaohms)</option>
+            </select>
+            
+            <button class="btn btn-learning" onclick="startTraining()">
+                📸 Tomar Foto para Entrenar
+            </button>
+            
+            <canvas id="trainingCanvas"></canvas>
             
             <div id="trainingControls" style="display: none;">
-                <button class="btn btn-primary" onclick="saveTraining()">
-                    💾 Guardar Entrenamiento
+                <div class="instructions active">
+                    <div class="step active">Toca cada banda para entrenar</div>
+                </div>
+                <button class="btn btn-primary" onclick="saveTraining()" id="saveBtn" disabled>
+                    💾 Guardar Patrón
                 </button>
             </div>
-
-            <!-- Base de datos -->
-            <div style="margin-top: 30px;">
-                <h4 style="color: var(--learning);">📊 Base de Datos</h4>
-                <div id="dbInfo" style="margin: 15px 0;"></div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            
+            <div style="margin-top: 20px;">
+                <h4 style="color: #ff00ff; margin-bottom: 10px;">📊 Base de Datos</h4>
+                <div id="dbInfo" style="margin-bottom: 10px;">0 patrones guardados</div>
+                <div class="db-controls">
                     <button class="btn btn-learning" onclick="exportDB()">📥 Exportar</button>
-                    <button class="btn btn-learning" onclick="document.getElementById('importFile').click()">📤 Importar</button>
-                    <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importDB(this)">
+                    <button class="btn btn-learning" onclick="document.getElementById('importInput').click()">📤 Importar</button>
+                    <input type="file" id="importInput" accept=".json" onchange="importDB(this)">
                 </div>
-                <button class="btn btn-secondary" onclick="clearDB()" style="margin-top: 10px;">
-                    🗑️ Limpiar Base de Datos
-                </button>
+                <button class="btn btn-secondary" onclick="clearDB()">🗑️ Limpiar BD</button>
             </div>
         </div>
 
-        <!-- Sección Manual -->
+        <!-- MANUAL -->
         <div id="manual" class="section">
-            <div class="resistor-visual">
-                <div class="band" data-band="1"></div>
-                <div class="band" data-band="2"></div>
-                <div class="band" data-band="3"></div>
-                <div class="band" data-band="4"></div>
-                <div class="band" data-band="5"></div>
+            <div class="resistor">
+                <div class="band" data-band="1" onclick="selectBand(1)"></div>
+                <div class="band" data-band="2" onclick="selectBand(2)"></div>
+                <div class="band" data-band="3" onclick="selectBand(3)"></div>
+                <div class="band" data-band="4" onclick="selectBand(4)"></div>
+                <div class="band" data-band="5" onclick="selectBand(5)"></div>
             </div>
-
-            <div id="bandSelector">
-                <h4 style="color: var(--primary); margin-bottom: 15px;">Selecciona colores:</h4>
+            
+            <div id="colorSelector">
+                <h4 style="margin-bottom: 10px;">Banda <span id="currentBand">1</span></h4>
                 <div class="color-grid" id="colorGrid"></div>
             </div>
-
+            
             <button class="btn btn-primary" onclick="calculateManual()">
                 ⚡ Calcular Valor
             </button>
-
+            
             <div id="manualResult"></div>
         </div>
 
-        <!-- Historial -->
-        <div style="margin-top: 30px;">
-            <h3 style="color: var(--primary);">📊 Historial</h3>
-            <div id="history"></div>
+        <!-- HISTORIAL -->
+        <div style="margin-top: 25px;">
+            <h3 style="color: #00ff88; margin-bottom: 10px;">📊 Historial</h3>
+            <div id="historyList"></div>
+            <button class="btn btn-secondary" onclick="clearHistory()" style="margin-top: 10px;">
+                🗑️ Limpiar Historial
+            </button>
         </div>
     </div>
 
     <script>
-        // ===================================
+        // =========================
         // VARIABLES GLOBALES
-        // ===================================
+        // =========================
         const colorCodes = {
-            'Negro': { value: 0, multiplier: 1, tolerance: null, hex: '#000000', rgb: [0, 0, 0] },
-            'Marrón': { value: 1, multiplier: 10, tolerance: 1, hex: '#8B4513', rgb: [139, 69, 19] },
-            'Rojo': { value: 2, multiplier: 100, tolerance: 2, hex: '#FF0000', rgb: [255, 0, 0] },
-            'Naranja': { value: 3, multiplier: 1000, tolerance: null, hex: '#FFA500', rgb: [255, 165, 0] },
-            'Amarillo': { value: 4, multiplier: 10000, tolerance: 5, hex: '#FFFF00', rgb: [255, 255, 0] },
-            'Verde': { value: 5, multiplier: 100000, tolerance: 0.5, hex: '#008000', rgb: [0, 128, 0] },
-            'Azul': { value: 6, multiplier: 1000000, tolerance: 0.25, hex: '#0000FF', rgb: [0, 0, 255] },
-            'Violeta': { value: 7, multiplier: 10000000, tolerance: 0.1, hex: '#8B008B', rgb: [139, 0, 139] },
-            'Gris': { value: 8, multiplier: 100000000, tolerance: 0.05, hex: '#808080', rgb: [128, 128, 128] },
-            'Blanco': { value: 9, multiplier: 1000000000, tolerance: null, hex: '#FFFFFF', rgb: [255, 255, 255] },
-            'Dorado': { value: null, multiplier: 0.1, tolerance: 5, hex: '#FFD700', rgb: [255, 215, 0] },
-            'Plateado': { value: null, multiplier: 0.01, tolerance: 10, hex: '#C0C0C0', rgb: [192, 192, 192] }
+            'Negro': { value: 0, multiplier: 1, hex: '#000000', rgb: [0,0,0] },
+            'Marrón': { value: 1, multiplier: 10, hex: '#8B4513', rgb: [139,69,19] },
+            'Rojo': { value: 2, multiplier: 100, hex: '#FF0000', rgb: [255,0,0] },
+            'Naranja': { value: 3, multiplier: 1000, hex: '#FFA500', rgb: [255,165,0] },
+            'Amarillo': { value: 4, multiplier: 10000, hex: '#FFFF00', rgb: [255,255,0] },
+            'Verde': { value: 5, multiplier: 100000, hex: '#008000', rgb: [0,128,0] },
+            'Azul': { value: 6, multiplier: 1000000, hex: '#0000FF', rgb: [0,0,255] },
+            'Violeta': { value: 7, multiplier: 10000000, hex: '#8B008B', rgb: [139,0,139] },
+            'Gris': { value: 8, multiplier: 100000000, hex: '#808080', rgb: [128,128,128] },
+            'Blanco': { value: 9, multiplier: 1000000000, hex: '#FFFFFF', rgb: [255,255,255] },
+            'Dorado': { multiplier: 0.1, tolerance: 5, hex: '#FFD700', rgb: [255,215,0] },
+            'Plateado': { multiplier: 0.01, tolerance: 10, hex: '#C0C0C0', rgb: [192,192,192] }
         };
 
         let currentImage = null;
@@ -565,59 +561,41 @@
         let history = [];
         let selectedBand = 1;
         let manualBands = {};
+        let canvasScale = 1;
 
-        // ===================================
+        // =========================
         // INICIALIZACIÓN
-        // ===================================
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('ResistorVision 2.1 iniciando...');
-            
-            // Cargar datos guardados
-            loadDatabase();
-            loadHistory();
+        // =========================
+        window.onload = function() {
+            loadData();
+            setupColorGrid();
             updateStats();
             
-            // Configurar tabs
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.addEventListener('click', function() {
-                    switchTab(this.dataset.tab);
-                });
-            });
-            
-            // Configurar input de foto
-            document.getElementById('photoFile').addEventListener('change', handlePhotoUpload);
-            
-            // Configurar canvas para clicks
-            const canvas = document.getElementById('photoCanvas');
-            canvas.addEventListener('click', handleCanvasClick);
-            canvas.addEventListener('touchstart', handleCanvasTouch);
-            
-            // Configurar modo manual
-            setupManualMode();
-            
-            // Reset button
-            document.getElementById('resetBtn').addEventListener('click', resetAnalysis);
-            
-            console.log('Inicialización completa');
-        });
+            // Event listeners
+            document.getElementById('photoInput').onchange = handlePhoto;
+            document.getElementById('photoCanvas').onclick = canvasClick;
+            document.getElementById('photoCanvas').ontouchstart = canvasTouch;
+            document.getElementById('trainingCanvas').onclick = trainingClick;
+            document.getElementById('trainingCanvas').ontouchstart = trainingTouch;
+        };
 
-        // ===================================
-        // CAMBIO DE TABS
-        // ===================================
-        function switchTab(tabName) {
-            // Actualizar tabs
+        // =========================
+        // TABS
+        // =========================
+        function openTab(tabName, element) {
+            // Desactivar todos los tabs
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
-            
-            // Actualizar secciones
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            
+            // Activar tab seleccionado
+            element.classList.add('active');
             document.getElementById(tabName).classList.add('active');
         }
 
-        // ===================================
+        // =========================
         // MODO ANÁLISIS
-        // ===================================
-        function handlePhotoUpload(e) {
+        // =========================
+        function handlePhoto(e) {
             const file = e.target.files[0];
             if (!file) return;
             
@@ -626,58 +604,49 @@
                 const img = new Image();
                 img.onload = function() {
                     currentImage = img;
-                    displayImage();
+                    showImage();
                 };
                 img.src = event.target.result;
             };
             reader.readAsDataURL(file);
         }
 
-        function displayImage() {
+        function showImage() {
             const canvas = document.getElementById('photoCanvas');
             const ctx = canvas.getContext('2d');
             
-            // Calcular tamaño
-            const maxWidth = 500;
-            const scale = Math.min(1, maxWidth / currentImage.width);
-            canvas.width = currentImage.width * scale;
-            canvas.height = currentImage.height * scale;
+            // Calcular escala
+            const maxWidth = window.innerWidth - 40;
+            canvasScale = Math.min(1, maxWidth / currentImage.width);
             
-            // Dibujar imagen
+            canvas.width = currentImage.width * canvasScale;
+            canvas.height = currentImage.height * canvasScale;
+            canvas.style.display = 'block';
+            
             ctx.drawImage(currentImage, 0, 0, canvas.width, canvas.height);
             
-            // Mostrar canvas y controles
-            canvas.style.display = 'block';
-            document.getElementById('uploadDiv').style.display = 'none';
-            document.getElementById('photoInstructions').style.display = 'block';
+            // UI updates
+            document.getElementById('uploadArea').style.display = 'none';
+            document.getElementById('instructions').classList.add('active');
             document.getElementById('analyzeControls').style.display = 'block';
+            document.getElementById('s1').classList.add('active');
             
-            // Reset markers
             markers = [];
-            updateMarkers();
-            
-            showMessage('Foto cargada. Toca cada banda de color en orden.', 'success');
+            toast('Foto cargada. Toca cada banda de color.', 'success');
         }
 
-        function handleCanvasClick(e) {
+        function canvasClick(e) {
             if (!currentImage || markers.length >= 5) return;
-            
-            const rect = e.target.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            
-            addMarker(x, y);
+            addMarker(e.offsetX, e.offsetY);
         }
 
-        function handleCanvasTouch(e) {
+        function canvasTouch(e) {
             e.preventDefault();
             if (!currentImage || markers.length >= 5) return;
             
             const rect = e.target.getBoundingClientRect();
-            const touch = e.touches[0];
-            const x = touch.clientX - rect.left;
-            const y = touch.clientY - rect.top;
-            
+            const x = e.touches[0].clientX - rect.left;
+            const y = e.touches[0].clientY - rect.top;
             addMarker(x, y);
         }
 
@@ -685,125 +654,124 @@
             const canvas = document.getElementById('photoCanvas');
             const ctx = canvas.getContext('2d');
             
-            // Obtener color
-            const imageData = ctx.getImageData(x - 5, y - 5, 10, 10);
-            const pixels = imageData.data;
+            // Get color
+            const imageData = ctx.getImageData(
+                Math.max(0, x-5), 
+                Math.max(0, y-5), 
+                10, 10
+            );
             
-            let r = 0, g = 0, b = 0, count = 0;
-            for (let i = 0; i < pixels.length; i += 4) {
-                r += pixels[i];
-                g += pixels[i + 1];
-                b += pixels[i + 2];
+            let r=0, g=0, b=0, count=0;
+            for(let i=0; i<imageData.data.length; i+=4) {
+                r += imageData.data[i];
+                g += imageData.data[i+1];
+                b += imageData.data[i+2];
                 count++;
             }
             
-            const color = {
-                r: Math.round(r / count),
-                g: Math.round(g / count),
-                b: Math.round(b / count)
-            };
+            markers.push({
+                x: x,
+                y: y,
+                color: {
+                    r: Math.round(r/count),
+                    g: Math.round(g/count),
+                    b: Math.round(b/count)
+                }
+            });
             
-            markers.push({ x, y, color });
-            updateMarkers();
+            drawMarkers();
+            updateInstructions();
             
-            // Actualizar UI
-            document.getElementById('step2').classList.add('active');
-            if (markers.length >= 3) {
-                document.getElementById('step3').classList.add('active');
-                document.getElementById('analyzeBtn').disabled = false;
-            }
-            if (markers.length >= 5) {
-                document.getElementById('step4').classList.add('active');
-                showMessage('5 bandas marcadas. Presiona Analizar.', 'info');
-            }
-            
-            // Vibración
-            if (navigator.vibrate) navigator.vibrate(50);
+            if(navigator.vibrate) navigator.vibrate(30);
         }
 
-        function updateMarkers() {
+        function drawMarkers() {
             const canvas = document.getElementById('photoCanvas');
             const ctx = canvas.getContext('2d');
             
-            // Redibujar imagen
-            if (currentImage) {
-                ctx.drawImage(currentImage, 0, 0, canvas.width, canvas.height);
-            }
+            ctx.drawImage(currentImage, 0, 0, canvas.width, canvas.height);
             
-            // Dibujar marcadores
-            markers.forEach((marker, index) => {
-                // Círculo
+            markers.forEach((m, i) => {
+                // Circle
                 ctx.strokeStyle = '#00ff88';
                 ctx.lineWidth = 3;
                 ctx.beginPath();
-                ctx.arc(marker.x, marker.y, 20, 0, 2 * Math.PI);
+                ctx.arc(m.x, m.y, 20, 0, Math.PI * 2);
                 ctx.stroke();
                 
-                // Número
+                // Number
                 ctx.fillStyle = '#fff';
                 ctx.font = 'bold 16px Arial';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                ctx.fillText(index + 1, marker.x, marker.y);
+                ctx.fillText(i+1, m.x, m.y);
             });
         }
 
+        function updateInstructions() {
+            if(markers.length > 0) {
+                document.getElementById('s2').classList.add('active');
+            }
+            if(markers.length >= 3) {
+                document.getElementById('s3').classList.add('active');
+                document.getElementById('analyzeBtn').disabled = false;
+            }
+            if(markers.length >= 5) {
+                document.getElementById('s4').classList.add('active');
+                toast('5 bandas marcadas. Presiona Analizar.', 'info');
+            }
+        }
+
+        function analyzeResistor() {
+            if(markers.length < 3) return;
+            
+            const colors = markers.map(m => findClosestColor(m.color));
+            const result = calculateResistance(colors);
+            
+            displayResult(result, 'analysisResult');
+            addToHistory(result);
+        }
+
         function resetAnalysis() {
-            document.getElementById('uploadDiv').style.display = 'block';
+            document.getElementById('uploadArea').style.display = 'block';
             document.getElementById('photoCanvas').style.display = 'none';
-            document.getElementById('photoInstructions').style.display = 'none';
+            document.getElementById('instructions').classList.remove('active');
             document.getElementById('analyzeControls').style.display = 'none';
-            document.getElementById('photoFile').value = '';
+            document.getElementById('analysisResult').innerHTML = '';
+            document.getElementById('photoInput').value = '';
+            
+            ['s1','s2','s3','s4'].forEach(id => 
+                document.getElementById(id).classList.remove('active')
+            );
+            
             currentImage = null;
             markers = [];
         }
 
-        // Botón Analizar
-        document.getElementById('analyzeBtn').addEventListener('click', function() {
-            if (markers.length < 3) return;
-            
-            // Buscar en base de datos o analizar colores
-            const colors = markers.map(m => m.color);
-            const match = findBestMatch(colors);
-            
-            let result;
-            if (match && match.confidence > 50) {
-                result = { value: match.pattern.value, method: 'IA', confidence: match.confidence };
-            } else {
-                // Análisis tradicional
-                const colorNames = colors.map(c => findClosestColor(c));
-                result = calculateValue(colorNames);
-                result.method = 'Tradicional';
-                result.confidence = 40;
-            }
-            
-            displayResult(result);
-            addToHistory(result);
-        });
-
-        // ===================================
+        // =========================
         // MODO ENTRENAMIENTO
-        // ===================================
+        // =========================
         function startTraining() {
             const value = document.getElementById('knownValue').value;
-            if (!value) {
-                showMessage('Ingresa el valor conocido', 'error');
+            if(!value) {
+                toast('Ingresa el valor conocido', 'error');
                 return;
             }
             
             const input = document.createElement('input');
             input.type = 'file';
             input.accept = 'image/*';
+            input.capture = 'environment';
             input.onchange = function(e) {
                 const file = e.target.files[0];
-                if (!file) return;
+                if(!file) return;
                 
                 const reader = new FileReader();
                 reader.onload = function(event) {
                     const img = new Image();
                     img.onload = function() {
                         currentImage = img;
-                        displayTrainingImage();
+                        showTrainingImage();
                     };
                     img.src = event.target.result;
                 };
@@ -812,275 +780,254 @@
             input.click();
         }
 
-        function displayTrainingImage() {
+        function showTrainingImage() {
             const canvas = document.getElementById('trainingCanvas');
             const ctx = canvas.getContext('2d');
             
-            const scale = Math.min(1, 500 / currentImage.width);
-            canvas.width = currentImage.width * scale;
-            canvas.height = currentImage.height * scale;
+            const maxWidth = window.innerWidth - 40;
+            canvasScale = Math.min(1, maxWidth / currentImage.width);
+            
+            canvas.width = currentImage.width * canvasScale;
+            canvas.height = currentImage.height * canvasScale;
             canvas.style.display = 'block';
             
             ctx.drawImage(currentImage, 0, 0, canvas.width, canvas.height);
             
-            markers = [];
             document.getElementById('trainingControls').style.display = 'block';
+            markers = [];
+        }
+
+        function trainingClick(e) {
+            if(!currentImage || markers.length >= 5) return;
+            trainingAddMarker(e.offsetX, e.offsetY);
+        }
+
+        function trainingTouch(e) {
+            e.preventDefault();
+            if(!currentImage || markers.length >= 5) return;
             
-            canvas.onclick = function(e) {
-                if (markers.length >= 5) return;
-                const rect = canvas.getBoundingClientRect();
-                const x = (e.clientX - rect.left) * (canvas.width / rect.width);
-                const y = (e.clientY - rect.top) * (canvas.height / rect.height);
-                
-                const ctx = canvas.getContext('2d');
-                const imageData = ctx.getImageData(x - 5, y - 5, 10, 10);
-                const pixels = imageData.data;
-                
-                let r = 0, g = 0, b = 0, count = 0;
-                for (let i = 0; i < pixels.length; i += 4) {
-                    r += pixels[i];
-                    g += pixels[i + 1];
-                    b += pixels[i + 2];
-                    count++;
+            const rect = e.target.getBoundingClientRect();
+            const x = e.touches[0].clientX - rect.left;
+            const y = e.touches[0].clientY - rect.top;
+            trainingAddMarker(x, y);
+        }
+
+        function trainingAddMarker(x, y) {
+            const canvas = document.getElementById('trainingCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            const imageData = ctx.getImageData(
+                Math.max(0, x-5), 
+                Math.max(0, y-5), 
+                10, 10
+            );
+            
+            let r=0, g=0, b=0, count=0;
+            for(let i=0; i<imageData.data.length; i+=4) {
+                r += imageData.data[i];
+                g += imageData.data[i+1];
+                b += imageData.data[i+2];
+                count++;
+            }
+            
+            markers.push({
+                color: {
+                    r: Math.round(r/count),
+                    g: Math.round(g/count),
+                    b: Math.round(b/count)
                 }
-                
-                markers.push({
-                    x, y,
-                    color: {
-                        r: Math.round(r / count),
-                        g: Math.round(g / count),
-                        b: Math.round(b / count)
-                    }
-                });
-                
-                // Dibujar marcador
-                ctx.strokeStyle = '#ff00ff';
-                ctx.lineWidth = 3;
-                ctx.beginPath();
-                ctx.arc(x, y, 20, 0, 2 * Math.PI);
-                ctx.stroke();
-                
-                ctx.fillStyle = '#fff';
-                ctx.font = 'bold 16px Arial';
-                ctx.textAlign = 'center';
-                ctx.fillText(markers.length, x, y);
-            };
+            });
+            
+            // Draw marker
+            ctx.strokeStyle = '#ff00ff';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.arc(x, y, 20, 0, Math.PI * 2);
+            ctx.stroke();
+            
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 16px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(markers.length, x, y);
+            
+            if(markers.length >= 3) {
+                document.getElementById('saveBtn').disabled = false;
+            }
         }
 
         function saveTraining() {
-            if (markers.length < 3) {
-                showMessage('Marca al menos 3 bandas', 'error');
-                return;
-            }
+            if(markers.length < 3) return;
             
             const value = parseFloat(document.getElementById('knownValue').value);
             const unit = parseFloat(document.getElementById('knownUnit').value);
-            const actualValue = value * unit;
             
             database.push({
                 id: Date.now(),
                 colors: markers.map(m => m.color),
-                value: actualValue,
-                confidence: 1,
-                usage: 0
+                value: value * unit,
+                confidence: 1
             });
             
-            saveDatabase();
-            showMessage('Patrón guardado exitosamente', 'success');
+            saveData();
+            updateStats();
+            toast('Patrón guardado exitosamente', 'success');
             
+            // Reset
             document.getElementById('trainingCanvas').style.display = 'none';
             document.getElementById('trainingControls').style.display = 'none';
             document.getElementById('knownValue').value = '';
             markers = [];
         }
 
-        // ===================================
+        // =========================
         // MODO MANUAL
-        // ===================================
-        function setupManualMode() {
+        // =========================
+        function setupColorGrid() {
             const grid = document.getElementById('colorGrid');
             grid.innerHTML = '';
             
             Object.entries(colorCodes).forEach(([name, data]) => {
-                if (data.value !== null) {
+                if(data.value !== undefined) {
                     const btn = document.createElement('div');
                     btn.className = 'color-btn';
                     btn.style.backgroundColor = data.hex;
-                    btn.style.color = data.hex === '#FFFF00' || data.hex === '#FFFFFF' ? '#000' : '#fff';
+                    btn.style.color = (data.hex === '#FFFF00' || data.hex === '#FFFFFF') ? '#000' : '#fff';
                     btn.textContent = name;
-                    btn.onclick = () => selectManualColor(name);
+                    btn.onclick = () => selectColor(name);
                     grid.appendChild(btn);
                 }
             });
+        }
+
+        function selectBand(num) {
+            selectedBand = num;
+            document.getElementById('currentBand').textContent = num;
             
-            document.querySelectorAll('.band').forEach((band, index) => {
-                band.addEventListener('click', () => selectBand(index + 1));
-            });
+            document.querySelectorAll('.band').forEach(b => b.classList.remove('selected'));
+            document.querySelector(`[data-band="${num}"]`).classList.add('selected');
         }
 
-        function selectBand(band) {
-            selectedBand = band;
-            document.querySelectorAll('.band').forEach(b => b.style.border = '1px solid rgba(0, 0, 0, 0.2)');
-            document.querySelectorAll('.band')[band - 1].style.border = '3px solid var(--primary)';
-        }
-
-        function selectManualColor(color) {
+        function selectColor(color) {
             manualBands[selectedBand] = color;
-            document.querySelectorAll('.band')[selectedBand - 1].style.backgroundColor = colorCodes[color].hex;
+            document.querySelector(`[data-band="${selectedBand}"]`).style.backgroundColor = colorCodes[color].hex;
             
-            if (selectedBand < 5) {
+            if(selectedBand < 5) {
                 selectBand(selectedBand + 1);
             }
         }
 
         function calculateManual() {
-            if (!manualBands[1] || !manualBands[2]) {
-                showMessage('Selecciona al menos las primeras 2 bandas', 'error');
+            if(!manualBands[1] || !manualBands[2]) {
+                toast('Selecciona al menos 2 bandas', 'error');
                 return;
             }
             
             const colors = Object.values(manualBands);
-            const result = calculateValue(colors);
-            result.method = 'Manual';
-            result.confidence = 100;
-            
+            const result = calculateResistance(colors);
             displayResult(result, 'manualResult');
             addToHistory(result);
         }
 
-        // ===================================
-        // FUNCIONES AUXILIARES
-        // ===================================
+        // =========================
+        // CÁLCULOS
+        // =========================
         function findClosestColor(rgb) {
             let minDist = Infinity;
             let closest = 'Negro';
             
-            for (const [name, data] of Object.entries(colorCodes)) {
+            Object.entries(colorCodes).forEach(([name, data]) => {
                 const dist = Math.sqrt(
                     Math.pow(rgb.r - data.rgb[0], 2) +
                     Math.pow(rgb.g - data.rgb[1], 2) +
                     Math.pow(rgb.b - data.rgb[2], 2)
                 );
                 
-                if (dist < minDist) {
+                if(dist < minDist) {
                     minDist = dist;
                     closest = name;
                 }
-            }
+            });
             
             return closest;
         }
 
-        function calculateValue(colors) {
+        function calculateResistance(colors) {
             let value = 0;
             let multiplier = 1;
             
-            if (colors.length >= 2) {
-                value = colorCodes[colors[0]].value * 10 + colorCodes[colors[1]].value;
-                if (colors[2] && colorCodes[colors[2]].multiplier !== undefined) {
-                    multiplier = colorCodes[colors[2]].multiplier;
+            if(colors.length >= 2) {
+                value = (colorCodes[colors[0]].value || 0) * 10 + (colorCodes[colors[1]].value || 0);
+                if(colors[2]) {
+                    multiplier = colorCodes[colors[2]].multiplier || 1;
                 }
             }
             
+            const resistance = value * multiplier;
+            
             return {
-                value: value * multiplier,
+                value: resistance,
+                formatted: formatValue(resistance),
                 colors: colors,
-                tolerance: colors[3] ? colorCodes[colors[3]].tolerance : 20
+                tolerance: colors[3] ? (colorCodes[colors[3]].tolerance || 20) : 20
             };
         }
 
-        function findBestMatch(colors) {
-            if (database.length === 0) return null;
-            
-            let best = null;
-            let bestScore = Infinity;
-            
-            database.forEach(pattern => {
-                let score = 0;
-                for (let i = 0; i < Math.min(colors.length, pattern.colors.length); i++) {
-                    score += Math.sqrt(
-                        Math.pow(colors[i].r - pattern.colors[i].r, 2) +
-                        Math.pow(colors[i].g - pattern.colors[i].g, 2) +
-                        Math.pow(colors[i].b - pattern.colors[i].b, 2)
-                    );
-                }
-                
-                if (score < bestScore) {
-                    bestScore = score;
-                    best = { pattern, confidence: Math.max(0, 100 - score / 5) };
-                }
-            });
-            
-            return best;
+        function formatValue(value) {
+            if(value >= 1000000) {
+                return `${(value/1000000).toFixed(2)} MΩ`;
+            } else if(value >= 1000) {
+                return `${(value/1000).toFixed(2)} kΩ`;
+            }
+            return `${value.toFixed(2)} Ω`;
         }
 
-        function displayResult(result, targetId = 'analysisResult') {
-            let formatted = '';
-            if (result.value >= 1000000) {
-                formatted = `${(result.value / 1000000).toFixed(2)} MΩ`;
-            } else if (result.value >= 1000) {
-                formatted = `${(result.value / 1000).toFixed(2)} kΩ`;
-            } else {
-                formatted = `${result.value.toFixed(2)} Ω`;
-            }
-            
-            const html = `
+        function displayResult(result, targetId) {
+            document.getElementById(targetId).innerHTML = `
                 <div class="result">
-                    <div class="result-value">${formatted}</div>
-                    <div>Tolerancia: ±${result.tolerance || 20}%</div>
-                    <div>Método: ${result.method}</div>
-                    <div>Confianza: ${result.confidence.toFixed(0)}%</div>
+                    <div class="result-value">${result.formatted}</div>
+                    <div>Tolerancia: ±${result.tolerance}%</div>
+                    <div style="margin-top: 10px;">
+                        ${result.colors.map(c => 
+                            `<span style="display:inline-block; padding:2px 8px; margin:2px; 
+                                    background:${colorCodes[c].hex}; color:${
+                                    colorCodes[c].hex === '#FFFF00' || colorCodes[c].hex === '#FFFFFF' ? '#000' : '#fff'
+                                    }; border-radius:5px; font-size:0.8em;">${c}</span>`
+                        ).join('')}
+                    </div>
                 </div>
             `;
-            
-            document.getElementById(targetId).innerHTML = html;
         }
 
-        function showMessage(text, type = 'info') {
-            const msg = document.createElement('div');
-            msg.className = `message ${type}`;
-            msg.textContent = text;
-            msg.style.position = 'fixed';
-            msg.style.top = '20px';
-            msg.style.left = '50%';
-            msg.style.transform = 'translateX(-50%)';
-            msg.style.zIndex = '10000';
-            
-            document.body.appendChild(msg);
-            
-            setTimeout(() => msg.remove(), 3000);
-        }
-
-        // ===================================
+        // =========================
         // BASE DE DATOS
-        // ===================================
-        function loadDatabase() {
-            const saved = localStorage.getItem('resistorDB');
-            if (saved) {
-                database = JSON.parse(saved);
-            }
+        // =========================
+        function loadData() {
+            const savedDB = localStorage.getItem('resistorDB');
+            if(savedDB) database = JSON.parse(savedDB);
+            
+            const savedHistory = localStorage.getItem('resistorHistory');
+            if(savedHistory) history = JSON.parse(savedHistory);
+            
             updateDBInfo();
+            updateHistory();
         }
 
-        function saveDatabase() {
+        function saveData() {
             localStorage.setItem('resistorDB', JSON.stringify(database));
-            updateStats();
             updateDBInfo();
         }
 
         function updateDBInfo() {
-            const info = document.getElementById('dbInfo');
-            info.innerHTML = `Patrones guardados: ${database.length}`;
+            document.getElementById('dbInfo').textContent = `${database.length} patrones guardados`;
         }
 
         function exportDB() {
-            if (database.length === 0) {
-                showMessage('No hay datos para exportar', 'error');
+            if(database.length === 0) {
+                toast('No hay datos para exportar', 'error');
                 return;
             }
             
-            const data = JSON.stringify(database, null, 2);
-            const blob = new Blob([data], { type: 'application/json' });
+            const blob = new Blob([JSON.stringify(database, null, 2)], {type: 'application/json'});
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
@@ -1090,90 +1037,94 @@
 
         function importDB(input) {
             const file = input.files[0];
-            if (!file) return;
+            if(!file) return;
             
             const reader = new FileReader();
             reader.onload = function(e) {
                 try {
-                    const imported = JSON.parse(e.target.result);
-                    database = [...database, ...imported];
-                    saveDatabase();
-                    showMessage('Base de datos importada', 'success');
-                } catch (err) {
-                    showMessage('Error al importar', 'error');
+                    const data = JSON.parse(e.target.result);
+                    database = [...database, ...data];
+                    saveData();
+                    updateStats();
+                    toast('Base de datos importada', 'success');
+                } catch(err) {
+                    toast('Error al importar', 'error');
                 }
             };
             reader.readAsText(file);
         }
 
         function clearDB() {
-            if (confirm('¿Eliminar toda la base de datos?')) {
+            if(confirm('¿Borrar toda la base de datos?')) {
                 database = [];
-                saveDatabase();
-                showMessage('Base de datos limpiada', 'success');
+                saveData();
+                updateStats();
+                toast('Base de datos limpiada', 'success');
             }
         }
 
-        // ===================================
+        // =========================
         // HISTORIAL
-        // ===================================
-        function loadHistory() {
-            const saved = localStorage.getItem('resistorHistory');
-            if (saved) {
-                history = JSON.parse(saved);
-                updateHistoryDisplay();
-            }
-        }
-
+        // =========================
         function addToHistory(result) {
             history.unshift({
                 ...result,
-                timestamp: new Date().toLocaleString()
+                timestamp: new Date().toLocaleString('es')
             });
             
-            if (history.length > 10) {
-                history = history.slice(0, 10);
-            }
+            if(history.length > 10) history = history.slice(0, 10);
             
             localStorage.setItem('resistorHistory', JSON.stringify(history));
-            updateHistoryDisplay();
+            updateHistory();
         }
 
-        function updateHistoryDisplay() {
-            const div = document.getElementById('history');
-            if (history.length === 0) {
-                div.innerHTML = '<div class="message">No hay historial</div>';
+        function updateHistory() {
+            const list = document.getElementById('historyList');
+            
+            if(history.length === 0) {
+                list.innerHTML = '<div style="opacity:0.5;">No hay historial</div>';
                 return;
             }
             
-            div.innerHTML = history.map(h => {
-                let value = '';
-                if (h.value >= 1000000) {
-                    value = `${(h.value / 1000000).toFixed(2)} MΩ`;
-                } else if (h.value >= 1000) {
-                    value = `${(h.value / 1000).toFixed(2)} kΩ`;
-                } else {
-                    value = `${h.value.toFixed(2)} Ω`;
-                }
-                
-                return `
-                    <div style="padding: 10px; margin: 5px 0; background: rgba(255,255,255,0.05); border-radius: 10px;">
-                        <strong>${value}</strong> - ${h.method} - ${h.timestamp}
+            list.innerHTML = history.map(h => `
+                <div class="history-item">
+                    <div>
+                        <div class="history-value">${h.formatted}</div>
+                        <div style="font-size:0.8em; opacity:0.7;">±${h.tolerance}%</div>
                     </div>
-                `;
-            }).join('');
+                    <div class="history-time">${h.timestamp}</div>
+                </div>
+            `).join('');
         }
 
-        // ===================================
-        // ESTADÍSTICAS
-        // ===================================
+        function clearHistory() {
+            if(confirm('¿Limpiar el historial?')) {
+                history = [];
+                localStorage.removeItem('resistorHistory');
+                updateHistory();
+                toast('Historial limpiado', 'success');
+            }
+        }
+
+        // =========================
+        // UTILIDADES
+        // =========================
         function updateStats() {
             document.getElementById('patternsCount').textContent = database.length;
             document.getElementById('samplesCount').textContent = database.length;
             
             const accuracy = database.length > 0 ? 
                 Math.min(95, 60 + database.length * 2) : 0;
-            document.getElementById('accuracyRate').textContent = `${accuracy.toFixed(0)}%`;
+            document.getElementById('accuracyRate').textContent = `${accuracy}%`;
+        }
+
+        function toast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => toast.remove(), 3000);
         }
     </script>
 </body>
